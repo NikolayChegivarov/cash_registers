@@ -1,0 +1,37 @@
+{% load static %}
+
+{% block content %}
+<head>
+    <meta charset="UTF-8">
+    <title>Выбор адреса</title>
+
+    <style>
+        body {
+            background-image: url('{% static "cashbox_app/address.jpg" %}');
+            background-size: 100% auto;
+            background-repeat: no-repeat;
+            background-position: center;
+            height: 100vh;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .address-form {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1000;
+            font-size: 200%; /* Увеличение размера шрифта для всех элементов */
+        }
+    </style>
+</head>
+
+<form method="post" class="address-form">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Выбрать адрес</button>
+</form>
+
+{% endblock %}

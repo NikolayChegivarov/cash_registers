@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Отчет по соблюдению расписания</title>
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+        th, td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+<h1>Отчет по соблюдению расписания</h1>
+
+<table>
+    <tr>
+        <th>Улица</th>
+        <th>Дом</th>
+        <th>Автор</th>
+        <th>Дата</th>
+        <th>Пришел</th>
+        <th>Ушел</th>
+        <th>День недели</th>
+        <th>Время открытия</th>
+        <th>Время закрытия</th>
+    </tr>
+    {% for row in schedule_report %}
+    <tr>
+        <td>{{ row.id_address__street }}</td>
+        <td>{{ row.id_address__home }}</td>
+        <td>{{ row.author__username }}</td>
+        <td>{{ row.date }}</td>
+        <td>{{ row.opening_time_fact|default:'-' }}</td>
+        <td>{{ row.closing_time_fact|default:'-' }}</td>
+        <td>{{ row.day_of_week }}</td>
+        <td>{{ row.opening_time|time:"H:i:s" }}</td>
+        <td>{{ row.closing_time|time:"H:i:s" }}</td>
+    </tr>
+    {% endfor %}
+</table>
+
+</body>
+</html>

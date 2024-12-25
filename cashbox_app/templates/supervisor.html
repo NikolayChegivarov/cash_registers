@@ -1,0 +1,54 @@
+{% load static %}
+
+{% block content %}
+<head>
+    <meta charset="UTF-8">
+    <title>Выбор отчета</title>
+    <style>
+        body {
+            background-image: url('{% static "cashbox_app/table.jpg" %}');
+            background-size: 100% auto;
+            background-repeat: no-repeat;
+            background-position: center;
+            height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+        .headers {
+            position: fixed;
+            top: 10%;
+            left: 5%;
+            z-index: 1000;
+        }
+        .buttons {   /* Поле кнопок. */
+            position: fixed;
+            bottom: 10%;
+            left: 5%;
+            z-index: 1000;
+            font-size: 16px;
+            padding: 5px 10px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .buttons button {
+            cursor: pointer;  Изменить форму курсора при наведении */
+        }
+    </style>
+</head>
+
+<body>
+    <div class="headers">
+        <h1>Добро пожаловать, Руководитель!</h1>
+        <h2>Выбери нужный отчет</h2>
+    </div>
+    <div class="buttons">
+        <button onclick="window.location.href='{% url 'supervisor_cash_report' %}'">Кассовый отчет</button>
+        <button onclick="window.location.href='{% url 'count_visits' %}'">Количество смен</button>
+        <button onclick="window.location.href='{% url 'schedule' %}'">Соблюдение расписания</button>
+        <button onclick="window.location.href='{% url 'price_changes'%}'">Установить цены</button>
+        <button onclick="window.location.href='{% url 'harvest'%}'">Урожай</button>
+    </div>
+</body>
+</html>
+
+{% endblock %}

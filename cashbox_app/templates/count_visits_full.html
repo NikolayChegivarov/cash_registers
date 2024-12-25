@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Полный отчет</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+        }
+        h1 {
+            color: #333;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+        th, td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: left;
+        }
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        .error-message {
+            color: red;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+<h1>Полный отчет</h1>
+
+{% if debug_info %}
+<div class="debug-info">
+    {{ debug_info }}
+</div>
+{% endif %}
+
+{% if records_list %}
+<table>
+    <tr>
+        <th>Год</th>
+        <th>Месяц</th>
+        <th>День</th>
+        <th>Автор</th>
+    </tr>
+    {% for record in records_list %}
+    <tr>
+        <td>{{ record.year }}</td>
+        <td>{{ record.month }}</td>
+        <td>{{ record.day }}</td>
+        <td>{{ record.author__username }}</td>
+    </tr>
+    {% endfor %}
+</table>
+{% else %}
+<p>За выбранный период нет отчетов.</p>
+{% endif %}
+
+</body>
+</html>
+

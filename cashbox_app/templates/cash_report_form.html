@@ -1,0 +1,148 @@
+{% block content %}
+
+<head>
+    <meta charset="UTF-8">
+    <title>Сверка кассы</title>
+
+    <style>
+        form {
+            margin-top: 2em;   /* Отделяем информацию */
+        }
+        table {
+            width: 70%;    /* фиксирую ширину */
+            margin: 0 auto;  /* центрую таблицу */
+        }
+        .balance-table {
+            margin-top: 80px; /* Добавляет отступ сверху перед таблицей */
+            border-collapse: separate; /* Разделяем границы ячеек */
+            border-spacing: 0 10px; /* Добавляем отступы между строками */
+            box-shadow: 0 0 10px rgba(0,0,0,0.1); /* Добавляем легкую тень */
+            font-size: 18px; /* Увеличить шрифт таблицы */
+        }
+        .balance-table tr:nth-child(even) {
+            background-color: #f9f9f9; /* Альтернативная окраска четных строк */
+        }
+        .balance-table th, .balance-table td {
+            padding: 10px; /* Увеличиваем внутренние отступы ячеек */
+            text-align: left; /* Выравниваем текст по левому краю */
+            border-bottom: 1px solid #ccc; /* Добавляем нижнюю границу */
+        }
+        button[type="submit"] {
+            display: block; /* элементом блочного уровня */
+            width: 500px; /* Увеличить ширину */
+            height: 150px; /* Увеличить высоту */
+            font-size: 60px; /* Увеличить размер шрифта */
+            padding: 10px 20px; /* Добавить больше отступов */
+            border-radius: 5px; /* Слегка закругленные углы */
+            background-color: #007bff; /* Синий цвет фона */
+            color: white; /* Белый цвет текста */
+            cursor: pointer; /* Изменить форму курсора при наведении */
+            margin: 40px auto 0; /* Добавляет отступ сверху и центрирует горизонтально */
+        }
+
+        button[type="submit"]:hover {
+            background-color: #0056b3; /* Затемнение фона при наведении */
+        }
+    </style>
+
+</head>
+
+<h2 style="font-size: 18px; margin: 0;">Проверьте баланс в кассах.</h2>
+<h2 style="font-size: 18px; margin: 0;">При необходимости внесите изменения.</h2>
+<h2 style="font-size: 18px; margin: 0;">Нажмите "Начать смену" если баланс сходиться.</h2>
+<h2 style="font-size: 18px; margin: 0;">Если баланс не сходится, сообщите непосредственному руководителю.</h2>
+
+<form method="post">
+
+    {% csrf_token %}
+    <input type="hidden" name="next" value="{{ next }}">
+
+    <fieldset>
+        <legend>Информация</legend>
+        <div>
+            <label>Сотрудник смены:</label>
+            {{form.author}}
+        </div>
+
+        <div>
+            <label>Адрес:</label>
+            {{form.id_address}}
+        </div>
+
+        <div>
+            <label>Дата:</label>
+            {{form.data}}
+        </div>
+    </fieldset>
+
+    <table class="balance-table">
+        <tbody>
+
+        <tr>
+            <td>Вид кассы:</td>
+            <td>{{ form.cas_register_buying_up }}</td>
+            <td>{{ form.cas_register_pawnshop }}</td>
+            <td>{{ form.cas_register_technique }}</td>
+        </tr>
+
+        <tr>
+            <td>Остаток на начало дня:</td>
+            <td>{{ form.cash_balance_beginning_buying_up }}</td>
+            <td>{{ form.cash_balance_beginning_pawnshop }}</td>
+            <td>{{ form.cash_balance_beginning_technique }}</td>
+            <td>Остаток на начало дня:</td>
+        </tr>
+
+        <tr>
+            <td>Внесено в кассу:</td>
+            <td>{{ form.introduced_buying_up }}</td>
+            <td>{{ form.introduced_pawnshop }}</td>
+            <td>{{ form.introduced_technique }}</td>
+            <td>Внесено в кассу:</td>
+        </tr>
+
+        <tr>
+            <td>Средства от процентов с залога/возврата выданных займов:</td>
+            <td>{{ form.interest_return_buying_up }}</td>
+            <td>{{ form.interest_return_pawnshop }}</td>
+            <td>{{ form.interest_return_technique }}</td>
+            <td>Приход с продажи:</td>
+        </tr>
+
+        <tr>
+            <td>Выдано займов:</td>
+            <td>{{ form.loans_issued_buying_up }}</td>
+            <td>{{ form.loans_issued_pawnshop }}</td>
+            <td>{{ form.loans_issued_technique }}</td>
+            <td>Расход на скупку:</td>
+        </tr>
+
+        <tr>
+            <td>На хоз. нужды, оплату труда:</td>
+            <td>{{ form.used_farming_buying_up }}</td>
+            <td>{{ form.used_farming_pawnshop }}</td>
+            <td>{{ form.used_farming_technique }}</td>
+            <td>На хоз. нужды/запчасти на ремонт:</td>
+        </tr>
+
+        <tr>
+            <td>Выемка денежных средств руководителем:</td>
+            <td>{{ form.boss_took_it_buying_up }}</td>
+            <td>{{ form.boss_took_it_pawnshop }}</td>
+            <td>{{ form.boss_took_it_technique }}</td>
+            <td>Выемка денежных средств руководителем:</td>
+        </tr>
+
+        </tbody>
+    </table>
+
+    <div>
+        <label>Статус:</label>
+        {{ form.status }}
+    </div>
+
+    <button type="submit">Начать смену</button>
+</form>
+
+
+{% endblock %}

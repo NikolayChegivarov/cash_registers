@@ -1,0 +1,101 @@
+{% load static %}
+
+{% block content %}
+
+<head>
+    <meta charset="UTF-8">
+    <title>Сохраненные данные.</title>
+
+    <style>
+        body {
+            background-image: url("{% static "cashbox_app/file.jpg" %}");
+            background-size: cover;
+            background-position: center;
+        }
+        .container {
+            display: flex;   /* Создает flex-контейнер */
+            justify-content: center;   /* Центрирует гибкие элементы по горизонтали внутри контейнера */
+            align-items: center;   /* Центрирует элементы Flex по вертикали внутри контейнера */
+            min-height: 100vh;   /* Занимает как минимум всю высоту области */
+            font-size: 25px;   /* Увеличить шрифт */
+        }
+        div {
+            margin-bottom: 20px;  /* Добавьте больше места между элементами: */
+        }
+        * {
+            font-size: 100%; /* Увеличение размера шрифта для всех элементов */
+        }
+        .main-title {
+            font-size: 50px;  /* Увеличивает размер шрифта */
+            margin-top: -10px;   /* Уменьшите верхний выступ элемента. */
+            margin-bottom: -0px;   /* Уменьшает нижний отступ элемента. */
+        }
+        .main-h2 {
+            font-size: 20px;   /* Увеличивает размер шрифта */
+            margin-top: -0px;   /* Уменьшите верхний выступ элемента. */
+            margin-bottom: -0px;  /* Уменьшает нижний отступ элемента. */
+        }
+        button {
+            background-color: transparent;   /* устанавливает прозрачный цвет фона */
+            border: none;  /* удаляет любую границу с элемента */
+            cursor: pointer;  /* стиль курсора в виде указывающей руки при наведении на элемент */
+        }
+    </style>
+
+</head>
+
+<h2 class="main-title">Ваши данные сохранены. Их больше нельзя изменить.</h2>
+<h2 class="main-h2">Если завтра работает другой сотрудник нажмите "Сменить пользователя".</h2>
+<h2 class="main-h2">Если завтра работаете вы, вам не придется авторизоваться,
+    достаточно будет нажать кнопку "Новый день".</h2>
+<h2 class="main-h2">Если вы работаете с ноутбуком и переходите с точки на точку достаточно нажать "Сменить адрес".</h2>
+
+<div class="container">
+
+    <form method="post">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ next }}">
+        <div>
+            <label>Сотрудник смены:</label>
+            {{form.author}}
+        </div>
+        <div>
+            <label>Адрес:</label>
+            {{form.id_address}}
+        </div>
+
+        <div>
+            <label>Дата:</label>
+            {{form.data}}
+        </div>
+
+        <table>
+            <thead>
+            </thead>
+            <tbody>
+
+            <tr>
+                <td>Остаток на конец дня:</td>
+                <td id="cash_register_end_buying_up">{{ form.cash_register_end_buying_up }}</td>
+                <td id="cash_register_end_pawnshop">{{ form.cash_register_end_pawnshop }}</td>
+                <td id="cash_register_end_technique">{{ form.cash_register_end_technique }}</td>
+            </tr>
+
+            </tbody>
+        </table>
+
+        <div>
+            <label>Статус:</label>
+            {{ form.status }}
+        </div>
+
+        <div class="buttons">
+            <button type="submit" name="submit_button" value="Сменить пользователя">Сменить пользователя</button>
+            <button type="submit" name="submit_button" value="Новый день">Новый день</button>
+            <button type="submit" name="submit_button" value="Сменить адрес">Сменить адрес</button>
+        </div>
+
+    </form>
+</div>
+
+{% endblock %}

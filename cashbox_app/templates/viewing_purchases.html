@@ -1,0 +1,59 @@
+{% load static %}
+
+{% block content %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Просмотр скупок</title>
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+        th, td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+
+<h2>Список скупок</h2>
+
+<table>
+    <tr>
+        <th>Дата смены</th>
+        <th>Клиент</th>
+        <th>Наименование</th>
+        <th>Проба</th>
+        <th>Цена за грамм</th>
+        <th>Чистый вес</th>
+        <th>Фактический вес</th>
+        <th>Выдано денег</th>
+        <th>Статус скупки</th>
+        <th>Сотрудник смены</th>
+    </tr>
+
+    {% for purchase in purchases %}
+    <tr>
+        <td>{{ purchase.shift_date }}</td>
+        <td>{{ purchase.client }}</td>
+        <td>{{ purchase.nomenclature }}</td>
+        <td>{{ purchase.gold_standard }}</td>
+        <td>{{ purchase.price }}</td>
+        <td>{{ purchase.weight_clean }}</td>
+        <td>{{ purchase.weight_fact }}</td>
+        <td>{{ purchase.sum }}</td>
+        <td>{{ purchase.status }}</td>
+        <td>{{ purchase.author }}</td>
+    </tr>
+    {% endfor %}
+</table>
+
+</body>
+</html>
+{% endblock %}

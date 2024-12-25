@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Изменение цен</title>
+</head>
+<body>
+
+<h1>Здесь можно изменить цены.</h1>
+<form method="post" class="PriceChanges">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Сохранить цены</button>
+</form>
+
+<h2>Текущие цены:</h2>
+<table>
+    <tr>
+        <th>Дата изменения</th>
+        <th>Проба</th>
+        <th>Цена</th>
+    </tr>
+    {% for item in tabl %}
+    <tr>
+        <td>{{ item.shift_date }}</td>
+        <td>{{ item.gold_standard }}</td>
+        <td>{{ item.price_rubles }}</td>
+    </tr>
+    {% endfor %}
+</table>
+
+</body>
+</html>

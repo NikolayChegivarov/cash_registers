@@ -553,6 +553,7 @@ class SecretRoomForm(forms.ModelForm):
             "weight_clean",
             "weight_fact",
             "sum",
+            "not_standard"
         ]
         widgets = {  # Виджеты.
             "client": forms.TextInput(
@@ -574,6 +575,7 @@ class SecretRoomForm(forms.ModelForm):
             "weight_clean": forms.NumberInput(attrs={"class": "form-control"}),
             "weight_fact": forms.NumberInput(attrs={"class": "form-control"}),
             "sum": forms.NumberInput(attrs={"class": "form-control"}),
+            "not_standard": forms.CheckboxInput(),
         }
         labels = {  # Ярлыки.
             "client": "Клиент",
@@ -583,4 +585,5 @@ class SecretRoomForm(forms.ModelForm):
             "weight_clean": "Чистый вес",
             "weight_fact": "Фактический вес",
             "sum": "Выдано денег",
+            "not_standard": "Не стандарт",
         }

@@ -439,13 +439,9 @@ class SecretRoom(models.Model):
         silver_standards = (925, 875)
 
         if self.gold_standard in gold_standards:
-            self.converter585 = probe_converter_gold(
-                self.weight_clean, self.gold_standard
-            )
+            self.converter585 = probe_converter_gold(self.weight_clean, self.gold_standard)
         elif self.gold_standard in silver_standards:
-            self.converter925 = probe_converter_silver(
-                self.weight_clean, self.gold_standard
-            )
+            self.converter925 = probe_converter_silver(self.weight_clean, self.gold_standard)
 
         # Сохраняем модель еще раз, чтобы обновить новые поля.
-        # self.save()
+        super().save(*args, **kwargs)

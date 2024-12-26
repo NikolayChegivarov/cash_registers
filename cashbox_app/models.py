@@ -5,7 +5,7 @@ from django.contrib.auth.models import (
     PermissionsMixin,
 )
 
-from functions import probe_converter_gold, probe_converter_silver
+# from functions import probe_converter_gold, probe_converter_silver
 
 
 class Address(models.Model):
@@ -333,6 +333,20 @@ class GoldStandard(models.Model):
         ordering = ["gold_standard"]
 
 
+def probe_converter_gold(weight, gold_standard):
+    gold_sample858 = 585
+
+    result = weight * gold_standard / gold_sample858
+    return round(result, 2)
+
+
+def probe_converter_silver(weight, gold_standard):
+    silver_sample858 = 925
+
+    result = weight * gold_standard / silver_sample858
+    return round(result, 2)
+
+
 class LocationStatusChoices(models.TextChoices):
     LOCAL = "В ФИЛИАЛЕ"
     GATHER = "СОБРАНО"
@@ -413,7 +427,7 @@ class SecretRoom(models.Model):
         )
 
     class Meta:
-        db_table = "secret_poom"
+        db_table = "secret_room"
         verbose_name = "Скупка"
         verbose_name_plural = "Скупки"
         ordering = ["id_address"]
@@ -434,4 +448,4 @@ class SecretRoom(models.Model):
             )
 
         # Сохраняем модель еще раз, чтобы обновить новые поля.
-        self.save()
+        # self.save()

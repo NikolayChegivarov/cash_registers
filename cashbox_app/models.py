@@ -361,7 +361,7 @@ class SecretRoom(models.Model):
         Address, on_delete=models.CASCADE, verbose_name="Адрес"
     )
     client = models.CharField(
-        max_length=50, default="Новый клиент", verbose_name="Клиент"
+        max_length=50, verbose_name="Клиент"
     )
     nomenclature = models.CharField(max_length=50, verbose_name="Наименование")
     gold_standard = models.IntegerField(

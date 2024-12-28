@@ -11,6 +11,7 @@
     {% csrf_token %}
     {{ form.as_p }}
     <button type="submit">Сохранить цены</button>
+    <button type="button" onclick="window.location.href='{% url 'supervisor'%}'">На главную</button>
 </form>
 
 <h2>Текущие цены:</h2>

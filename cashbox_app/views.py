@@ -1215,7 +1215,6 @@ class PriceChangesView(FormView):
             for key, value in cleaned_data.items():
                 if key.startswith(('gold_', 'silver_')):
                     numeric_key = extract_and_convert(key)
-                    print(numeric_key)
                     try:
                         instance, created = GoldStandard.objects.get_or_create(
                             gold_standard=numeric_key,

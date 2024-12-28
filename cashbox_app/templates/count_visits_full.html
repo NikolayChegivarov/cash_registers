@@ -33,6 +33,11 @@
 </head>
 <body>
 <h1>Полный отчет</h1>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="button" onclick="window.location.href='{% url 'supervisor'%}'">На главную</button>
+</form>
 
 {% if debug_info %}
 <div class="debug-info">

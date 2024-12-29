@@ -5,8 +5,6 @@ from django.contrib.auth.models import (
     PermissionsMixin,
 )
 
-# from functions import probe_converter_gold, probe_converter_silver
-
 
 class Address(models.Model):
     """Модель с адресами."""

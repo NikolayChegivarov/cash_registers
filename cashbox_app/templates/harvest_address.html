@@ -1,0 +1,22 @@
+{% load static %}
+
+{% block content %}
+<head>
+    <meta charset="UTF-8">
+    <title>Выбор отчета</title>
+    <style>
+
+    </style>
+</head>
+
+<body>
+    <h1>Выбор адреса</h1>
+
+    <form method="post" class="address-form">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Выбрать адрес</button>
+    </form>
+</body>
+</html>
+{% endblock %}

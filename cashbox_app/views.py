@@ -176,6 +176,11 @@ class AddressSelectionView(FormView):
     form_class = AddressSelectionForm
     success_url = reverse_lazy("cash_report_form")
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['form'] = self.form_class()
+        return context
+
     def form_valid(self, form):
         selected_address = form.cleaned_data["addresses"]
         self.request.session["selected_address_id"] = selected_address.id
@@ -1320,3 +1325,23 @@ class HarvestPrintViews(TemplateView):
         context["SecretRoom"] = SecretRoom.objects.all()
         print(f"context: {context}")
         return context
+
+
+class HarvestAddressViews(TemplateView):
+    template_name = "harvest_address.html"
+    form_class = AddressSelectionForm
+    success_url = reverse_lazy("cash_report_form")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['form'] = self.form_class()
+        return context
+
+    def post(self, request, *args, **kwargs):
+        form = self.form_class(request.POST)
+        if form.is_valid():
+            selected_address = form.cleaned_data["addresses"]
+            request.session["selected_address_id"] = selected_address.id
+            return redirect(self.success_url)
+        return render(request, self.template_name, {'form': form})
+

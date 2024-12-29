@@ -6,7 +6,7 @@
     <title>Выбор отчета</title>
     <style>
         body {
-            background-image: url('{% static "cashbox_app/table.jpg" %}');
+            background-image: url('{% static "cashbox_app/field.jpg" %}');
             background-size: 100% auto;
             background-repeat: no-repeat;
             background-position: center;
@@ -42,7 +42,8 @@
         <h2>апрапра</h2>
     </div>
     <div class="buttons">
-        <button onclick="window.location.href='{% url 'harvest_views' %}'">Урожай по всему полю</button>
+        <button onclick="window.location.href='{% url 'harvest_views' %}'">Урожай по всем землям</button>
+        <button onclick="window.location.href='{% url 'harvest_address' %}'">Урожай по конкретному полю</button>
     </div>
 </body>
 </html>

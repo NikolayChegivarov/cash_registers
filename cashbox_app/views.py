@@ -1327,10 +1327,10 @@ class HarvestPrintViews(TemplateView):
         return context
 
 
-class HarvestAddressViews(TemplateView):
+class HarvestAddressSchoiceViews(TemplateView):
     template_name = "harvest_address.html"
     form_class = AddressSelectionForm
-    success_url = reverse_lazy("cash_report_form")
+    success_url = reverse_lazy("harvest_address_views")
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -1345,3 +1345,22 @@ class HarvestAddressViews(TemplateView):
             return redirect(self.success_url)
         return render(request, self.template_name, {'form': form})
 
+
+class HarvestAddressViews(TemplateView):
+    template_name = "harvest_address_views.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        # Посмотрим что там в сессии
+        for key, value in self.request.session.items():
+            print(f'{key}: {value}')
+
+        # Возьмем из сессии адрес для запроса.
+        selected_address_id = self.request.session.get('selected_address_id')
+
+        print(f'context: {context}')
+        context["SecretRoom"] = SecretRoom.objects.filter(id_address=selected_address_id)
+
+        print(f"context: {context}")
+        return context

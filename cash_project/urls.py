@@ -35,6 +35,7 @@ from cashbox_app.views import (
     PriceChangesView,
     HarvestView,
     HarvestPrintViews,
+    HarvestAddressSchoiceViews,
     HarvestAddressViews,
 )
 
@@ -104,7 +105,12 @@ urlpatterns = [
     ),  # Собрать урожай весь
     path(
         "harvest/address",
-        HarvestAddressViews.as_view(),
+        HarvestAddressSchoiceViews.as_view(),
         name="harvest_address",
+    ),  # Собрать урожай по адресу
+    path(
+        "harvest/address/views",
+        HarvestAddressViews.as_view(),
+        name="harvest_address_views",
     ),  # Собрать урожай по адресу
 ]

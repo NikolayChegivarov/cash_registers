@@ -1317,15 +1317,72 @@ class HarvestView(TemplateView):
     template_name = "harvest.html"
 
 
+from django.db.models import F, Sum
+from django.template.response import TemplateResponse
+import psycopg2
+from django.conf import settings
+
 class HarvestPrintViews(TemplateView):
     template_name = "harvest_views.html"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        context["SecretRoom"] = SecretRoom.objects.all()
-        print(f"context: {context}")
+        # Получаем параметры подключения из настроек Django
+        db_params = {
+            "dbname": settings.DATABASES["default"]["NAME"],
+            "user": settings.DATABASES["default"]["USER"],
+            "password": settings.DATABASES["default"]["PASSWORD"],
+            "host": settings.DATABASES["default"]["HOST"],
+            "port": settings.DATABASES["default"]["PORT"]
+        }
+
+        # Создаем соединение с базой данных
+        try:
+            conn = psycopg2.connect(**db_params)
+            cur = conn.cursor()
+
+            # Формируем SQL-запрос
+            query = """
+            SELECT 
+                CONCAT(a.city, ', ', a.street, ' ', a.home) AS full_address,
+                SUM(sr.converter585),
+                SUM(sr.converter925)
+            FROM 
+                secret_room AS sr
+            INNER JOIN 
+                addresses AS a ON sr.id_address_id = a.id
+            GROUP BY 
+                a.city, a.street, a.home;
+            """
+
+            # Выполняем запрос
+            cur.execute(query)
+            rows = cur.fetchall()
+
+            # Преобразуем результаты в список словарей
+            secret_room_groups = [
+                {
+                    'full_address': row[0],
+                    'sum_converter585': float(row[1]) if row[1] else None,
+                    'sum_converter925': float(row[2]) if row[2] else None
+                }
+                for row in rows
+            ]
+
+            context['secret_room_groups'] = secret_room_groups
+
+        except (Exception, psycopg2.Error) as e:
+            print(f"Ошибка при выполнении запроса: {e}")
+
+        finally:
+            if conn:
+                cur.close()
+                conn.close()
+
         return context
+
+
 
 
 class HarvestAddressSchoiceViews(TemplateView):

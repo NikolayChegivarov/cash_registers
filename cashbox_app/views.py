@@ -1322,12 +1322,14 @@ class HarvestPrintViews(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+
         context["SecretRoom"] = SecretRoom.objects.all()
         print(f"context: {context}")
         return context
 
 
 class HarvestAddressSchoiceViews(TemplateView):
+    """Выбор филиала для отчета урожай."""
     template_name = "harvest_address.html"
     form_class = AddressSelectionForm
     success_url = reverse_lazy("harvest_address_views")

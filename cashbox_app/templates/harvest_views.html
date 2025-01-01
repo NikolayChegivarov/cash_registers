@@ -11,7 +11,7 @@
 
 <body>
     <div class="headers">
-        <h1>парапр</h1>
+        <h1>Все филиалы</h1>
         <h2>апрапра</h2>
     </div>
     <div class="content-container2">
@@ -20,37 +20,41 @@
                 <th colspan="3">Скупки:</th>
             </tr>
             <tr>
-                <th>Дата смены</th>
+<!--                <th>Дата смены</th>-->
                 <th>Адрес</th>
-                <th>Клиент</th>
-                <th>Наименование</th>
-                <th>Проба</th>
-                <th>Цена за грамм</th>
-                <th>Чистый вес</th>
-                <th>Фактический вес</th>
-                <th>Выдано денег</th>
-                <th>Статус скупки</th>
-                <th>Сотрудник смены</th>
+<!--                <th>Клиент</th>-->
+<!--                <th>Наименование</th>-->
+<!--                <th>Проба</th>-->
+<!--                <th>Цена за грамм</th>-->
+<!--                <th>Чистый вес</th>-->
+<!--                <th>Фактический вес</th>-->
+<!--                <th>Выдано денег</th>-->
+                <th>в 858</th>
+                <th>в 925</th>
+<!--                <th>Статус скупки</th>-->
+<!--                <th>Сотрудник смены</th>-->
             </tr>
             {% for item in SecretRoom %}
             <tr>
-                <td>{{ item.shift_date }}</td>
+<!--                <td>{{ item.shift_date }}</td>-->
                 <td>{{ item.id_address }}</td>
-                <td>{{ item.client }}</td>
-                <td>{{ item.nomenclature }}</td>
-                <td>{{ item.gold_standard }}</td>
-                <td>{{ item.price }}</td>
-                <td>{{ item.weight_clean }}</td>
-                <td>{{ item.weight_fact }}</td>
-                <td>{{ item.sum }}</td>
-                <td>{{ item.status }}</td>
-                <td>{{ item.author }}</td>
+<!--                <td>{{ item.client }}</td>-->
+<!--                <td>{{ item.nomenclature }}</td>-->
+<!--                <td>{{ item.gold_standard }}</td>-->
+<!--                <td>{{ item.price }}</td>-->
+<!--                <td>{{ item.weight_clean }}</td>-->
+<!--                <td>{{ item.weight_fact }}</td>-->
+<!--                <td>{{ item.sum }}</td>-->
+                <td>{{ item.converter585 }}</td>
+                <td>{{ item.converter925 }}</td>
+<!--                <td>{{ item.status }}</td>-->
+<!--                <td>{{ item.author }}</td>-->
             </tr>
             {% endfor %}
         </table>
     </div>
     <div class="buttons">
-        <button onclick="window.location.href='{% url 'harvest_views' %}'">Показать уражай</button>
+        <button onclick="window.location.href='{% url 'harvest_views' %}'">Собрать урожай</button>
     </div>
 </body>
 </html>

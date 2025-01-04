@@ -1,6 +1,7 @@
 from django.contrib.auth.views import LoginView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth import login, authenticate
+from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import Http404
 from django.shortcuts import render, redirect
@@ -11,17 +12,19 @@ from django.utils.decorators import method_decorator
 from django.utils.timezone import now
 from django.utils import timezone
 from django.urls import reverse_lazy, reverse
-from django.db.models import Prefetch
-from django.db.models import Count
-from django.db.models import Max
+from django.db import transaction
 from django.db.models.fields import CharField
 from django.db.models import (
-    Case,
-    Value,
-    When,
-    Func,
+    Prefetch,
     Subquery,
     OuterRef,
+    Value,
+    Count,
+    When,
+    Func,
+    Case,
+    Max,
+    Sum,
     F,
 )
 from django.db.models.functions import (
@@ -52,8 +55,8 @@ from cashbox_app.models import (
 )
 from datetime import date
 import pandas as pd
+import psycopg2
 import logging
-from django.db import transaction
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.DEBUG)
@@ -1317,11 +1320,6 @@ class HarvestView(TemplateView):
     template_name = "harvest.html"
 
 
-from django.db.models import F, Sum
-from django.template.response import TemplateResponse
-import psycopg2
-from django.conf import settings
-
 class HarvestPrintViews(TemplateView):
     template_name = "harvest_views.html"
 
@@ -1381,8 +1379,6 @@ class HarvestPrintViews(TemplateView):
                 conn.close()
 
         return context
-
-
 
 
 class HarvestAddressSchoiceViews(TemplateView):

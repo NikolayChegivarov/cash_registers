@@ -45,6 +45,7 @@ from cashbox_app.forms import (
 )
 from cashbox_app.models import (
     Address,
+    LocationStatusChoices,
     CashReport,
     CashRegisterChoices,
     CashReportStatusChoices,
@@ -1350,6 +1351,8 @@ class HarvestPrintViews(TemplateView):
                 secret_room AS sr
             INNER JOIN 
                 addresses AS a ON sr.id_address_id = a.id
+            WHERE 
+                status = 'В ФИЛИАЛЕ'
             GROUP BY 
                 a.city, a.street, a.home;
             """
@@ -1402,6 +1405,7 @@ class HarvestAddressSchoiceViews(TemplateView):
 
 
 class HarvestAddressViews(TemplateView):
+    """Показ урожая по конкретному филиалу."""
     template_name = "harvest_address_views.html"
 
     def get_context_data(self, **kwargs):
@@ -1409,13 +1413,69 @@ class HarvestAddressViews(TemplateView):
 
         # Посмотрим что там в сессии
         for key, value in self.request.session.items():
-            print(f'{key}: {value}')
+                print(f'{key}: {value}')    # Получаем выбранный идентификатор адреса из сессии
 
-        # Возьмем из сессии адрес для запроса.
-        selected_address_id = self.request.session.get('selected_address_id')
+        # Получаем выбранный идентификатор адреса из сессии
+        selected_address_id = self.request.session.get('selected_address_id', None)
 
-        print(f'context: {context}')
-        context["SecretRoom"] = SecretRoom.objects.filter(id_address=selected_address_id)
+        # Создаем словарь с параметрами для запроса
+        params = {
+            "dbname": settings.DATABASES["default"]["NAME"],
+            "user": settings.DATABASES["default"]["USER"],
+            "password": settings.DATABASES["default"]["PASSWORD"],
+            "host": settings.DATABASES["default"]["HOST"],
+            "port": settings.DATABASES["default"]["PORT"]
+        }
 
-        print(f"context: {context}")
+        # Создаем объект курсора
+        try:
+            conn = psycopg2.connect(**params)
+            cur = conn.cursor()
+
+            # Формулируем SQL-запрос с новым условием
+            query = """
+            SELECT 
+                CONCAT(a.city, ', ', a.street, ' ', a.home) AS full_address,
+                SUM(sr.converter585),
+                SUM(sr.converter925)
+            FROM 
+                secret_room AS sr
+            INNER JOIN 
+                addresses AS a ON sr.id_address_id = a.id
+            WHERE 
+                status = %s
+                AND (sr.id_address_id = %s OR %s IS NULL)
+            GROUP BY 
+                a.city, a.street, a.home;
+            """
+
+            # Выполняем запрос с параметрами
+            cur.execute(query, (
+                LocationStatusChoices.LOCAL.value,  # Используем константу для статуса
+                selected_address_id,  # Передаем selected_address_id как параметр
+                selected_address_id  # Передаем selected_address_id в качестве условия NULL
+            ))
+
+            rows = cur.fetchall()
+
+            # Обрабатываем результаты как раньше
+            secret_room_groups = [
+                {
+                    'full_address': row[0],
+                    'sum_converter585': float(row[1]) if row[1] else None,
+                    'sum_converter925': float(row[2]) if row[2] else None
+                }
+                for row in rows
+            ]
+
+            context['secret_room_groups'] = secret_room_groups
+
+        except (Exception, psycopg2.Error) as e:
+            print(f"Error executing query: {e}")
+
+        finally:
+            if conn:
+                cur.close()
+                conn.close()
+
         return context

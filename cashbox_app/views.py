@@ -1322,6 +1322,7 @@ class HarvestView(TemplateView):
 
 
 class HarvestPrintViews(TemplateView):
+    """Показывает все филиалы."""
     template_name = "harvest_views.html"
 
     def get_context_data(self, **kwargs):

@@ -1441,7 +1441,7 @@ class HarvestAddressViews(TemplateView):
             conn = psycopg2.connect(**params)
             cur = conn.cursor()
 
-            # Формулируем SQL-запрос с новым условием
+            # Формулируем SQL-запрос для просмотра скупок в филиале.
             query = """
             SELECT 
                 CONCAT(a.city, ', ', a.street, ' ', a.home) AS full_address,
@@ -1458,7 +1458,7 @@ class HarvestAddressViews(TemplateView):
                 a.city, a.street, a.home;
             """
 
-            # Выполняем запрос с параметрами
+            # Параметры к запросу.
             cur.execute(query, (
                 LocationStatusChoices.LOCAL.value,  # Используем константу для статуса
                 selected_address_id,  # Передаем selected_address_id как параметр
@@ -1467,7 +1467,7 @@ class HarvestAddressViews(TemplateView):
 
             rows = cur.fetchall()
 
-            # Обрабатываем результаты как раньше
+            # Обрабатываем результаты.
             secret_room_groups = [
                 {
                     'full_address': row[0],
@@ -1490,8 +1490,7 @@ class HarvestAddressViews(TemplateView):
         return context
 
     def update_status(self, address_id):
-        print(f"Updating status for address ID: {address_id}")
-        print(f"Current context: {self.get_context_data()}")
+        """Функция для изменения статуса."""
         params = {
             "dbname": settings.DATABASES["default"]["NAME"],
             "user": settings.DATABASES["default"]["USER"],
@@ -1529,13 +1528,9 @@ class HarvestAddressViews(TemplateView):
     def update_status_purchase(self, request):
         selected_address_id = self.request.session.get('selected_address_id', None)
         if request.method == 'POST':
-            print("Обработка POST-запроса")
-
             if selected_address_id:
-                print("Calling update_status method")
                 update_result = self.update_status(selected_address_id)
                 print(f"Update result: {update_result}")
-
                 if update_result:
                     return render(request, 'harvest_address_views.html', {
                         'message': f'Successfully updated status for address {selected_address_id}',

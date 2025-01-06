@@ -1,9 +1,10 @@
+from django.shortcuts import render
 from django.contrib.auth.views import LoginView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth import login, authenticate
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
-from django.http import Http404
+from django.http import Http404, HttpResponse
 from django.shortcuts import render, redirect
 from django.views import View
 from django.views.generic import FormView, TemplateView
@@ -1409,12 +1410,19 @@ class HarvestAddressViews(TemplateView):
     """Показ урожая по конкретному филиалу."""
     template_name = "harvest_address_views.html"
 
+    def get(self, request, *args, **kwargs):
+        context = self.get_context_data(**kwargs)
+        return self.render_to_response(context)
+
+    def post(self, request, *args, **kwargs):
+        return self.update_status_purchase(request)
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
         # Посмотрим что там в сессии
         for key, value in self.request.session.items():
-                print(f'{key}: {value}')    # Получаем выбранный идентификатор адреса из сессии
+            print(f'Инфа из сессии: {key}: {value}')    # Получаем выбранный идентификатор адреса из сессии
 
         # Получаем выбранный идентификатор адреса из сессии
         selected_address_id = self.request.session.get('selected_address_id', None)
@@ -1480,3 +1488,69 @@ class HarvestAddressViews(TemplateView):
                 conn.close()
 
         return context
+
+    def update_status(self, address_id):
+        print(f"Updating status for address ID: {address_id}")
+        print(f"Current context: {self.get_context_data()}")
+        params = {
+            "dbname": settings.DATABASES["default"]["NAME"],
+            "user": settings.DATABASES["default"]["USER"],
+            "password": settings.DATABASES["default"]["PASSWORD"],
+            "host": settings.DATABASES["default"]["HOST"],
+            "port": settings.DATABASES["default"]["PORT"]
+        }
+
+        try:
+            conn = psycopg2.connect(**params)
+            cur = conn.cursor()
+
+            query = """
+            UPDATE secret_room
+            SET status = %s
+            WHERE id_address_id = %s AND status = %s
+            RETURNING id;
+            """
+
+            cur.execute(query, (LocationStatusChoices.GATHER.value, address_id, LocationStatusChoices.LOCAL.value))
+
+            updated_count = cur.rowcount
+            print(f"Обновлена.. {updated_count} ..запись")
+
+            conn.commit()
+        except (Exception, psycopg2.Error) as e:
+            print(f"Error updating status: {e}")
+        finally:
+            if conn:
+                cur.close()
+                conn.close()
+
+        return updated_count == 1  # Верните True, если была обновлена только одна запись.
+
+    def update_status_purchase(self, request):
+        selected_address_id = self.request.session.get('selected_address_id', None)
+        if request.method == 'POST':
+            print("Обработка POST-запроса")
+
+            if selected_address_id:
+                print("Calling update_status method")
+                update_result = self.update_status(selected_address_id)
+                print(f"Update result: {update_result}")
+
+                if update_result:
+                    return render(request, 'harvest_address_views.html', {
+                        'message': f'Successfully updated status for address {selected_address_id}',
+                        'secret_room_groups': []
+                    })
+                else:
+                    return render(request, 'harvest_address_views.html', {
+                        'error_message': f'No secret rooms found with status LOCAL at address {selected_address_id}',
+                        'secret_room_groups': []
+                    })
+            else:
+                print(f"selected_address_id не получен.")
+                return render(request, 'harvest_address_views.html', {
+                    'error_message': 'Please select an address before harvesting.',
+                    'secret_room_groups': []
+                })
+        else:
+            return HttpResponse(status=405)  # Method Not Allowed

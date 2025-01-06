@@ -3,7 +3,7 @@
 {% block content %}
 <head>
     <meta charset="UTF-8">
-    <title>Выбор отчета</title>
+    <title>Урожай по филиалу</title>
     <style>
         table {
             border-collapse: collapse;
@@ -44,9 +44,11 @@
             {% endif %}
         </table>
     </div>
-    </div>
     <div class="buttons">
-        <button onclick="window.location.href='{% url 'harvest_views' %}'">Собрать урожай</button>
+        <form action="{% url 'harvest_address_views' %}" method="post">
+            {% csrf_token %}
+            <button type="submit">Собрать урожай</button>
+        </form>
     </div>
 </body>
 </html>

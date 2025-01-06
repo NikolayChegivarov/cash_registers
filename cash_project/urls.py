@@ -107,10 +107,12 @@ urlpatterns = [
         "harvest/address",
         HarvestAddressSchoiceViews.as_view(),
         name="harvest_address",
-    ),  # Собрать урожай по адресу
+    ),  # Страница выбора адреса
     path(
         "harvest/address/views",
         HarvestAddressViews.as_view(),
         name="harvest_address_views",
-    ),  # Собрать урожай по адресу
+    ),  # Показывает урожай по конкретному адресу.
+    # path('update-status/', update_secret_room_status,
+    #      name='update-secret-room-status'),
 ]

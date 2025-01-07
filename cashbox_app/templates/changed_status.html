@@ -1,0 +1,33 @@
+{% load static %}
+
+{% block content %}
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Изменение статуса</title>
+        <style>
+            table {
+                border-collapse: collapse;
+                width: 100%;
+            }
+            th, td {
+                border: 1px solid black;
+                padding: 10px;
+            }
+        </style>
+    </head>
+
+    <body>
+        <h1>Изменение статуса успешно!</h1>
+        <p>Адрес: {{ selected_address_id }}</p>
+
+        <div class="content-container2">
+            <table class="balance-table">
+                <!-- Здесь можно добавить информацию о результате обновления -->
+            </table>
+        </div>
+
+        <button onclick="window.location.href='{% url 'supervisor' %}'">Вернуться на главную</button>
+    </body>
+</html>
+{% endblock %}

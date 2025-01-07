@@ -16,6 +16,7 @@
         {% csrf_token %}
         {{ form.as_p }}
         <button type="submit">Выбрать адрес</button>
+        <button onclick="window.location.href='{% url 'supervisor' %}'">Вернуться на главную</button>
     </form>
 </body>
 </html>

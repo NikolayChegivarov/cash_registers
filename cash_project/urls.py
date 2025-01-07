@@ -37,6 +37,7 @@ from cashbox_app.views import (
     HarvestPrintViews,
     HarvestAddressSchoiceViews,
     HarvestAddressViews,
+    ChangedStatusView,
 )
 
 urlpatterns = [
@@ -76,7 +77,9 @@ urlpatterns = [
         "schedule", ScheduleView.as_view(), name="schedule"
     ),  # Фильтр отчета "расписание".
     path(
-        "schedule/report", ScheduleReportView.as_view(), name="schedule_report"
+        "schedule/report",
+        ScheduleReportView.as_view(),
+        name="schedule_report"
     ),  # Отчет "расписание".
     path(
         "cash_report/",
@@ -113,6 +116,8 @@ urlpatterns = [
         HarvestAddressViews.as_view(),
         name="harvest_address_views",
     ),  # Показывает урожай по конкретному адресу.
-    # path('update-status/', update_secret_room_status,
-    #      name='update-secret-room-status'),
+    path('changed-status/<int:selected_address_id>/',
+         ChangedStatusView.as_view(),
+         name='changed_status'
+    ),  # Показывает измененный адрес.
 ]

@@ -1490,7 +1490,7 @@ class HarvestAddressViews(TemplateView):
         return context
 
     def update_status(self, address_id):
-        """Функция для изменения статуса."""
+        """Изменяет статус скупок конкретного филиала с 'В ФИЛИАЛЕ' на 'СОБРАНО'."""
         params = {
             "dbname": settings.DATABASES["default"]["NAME"],
             "user": settings.DATABASES["default"]["USER"],
@@ -1523,7 +1523,7 @@ class HarvestAddressViews(TemplateView):
                 cur.close()
                 conn.close()
 
-        return updated_count == 1  # Верните True, если была обновлена только одна запись.
+        return updated_count > 0  # Вернет True, если была обновлена хотя бы одна запись
 
     def update_status_purchase(self, request):
         selected_address_id = self.request.session.get('selected_address_id', None)
@@ -1532,20 +1532,32 @@ class HarvestAddressViews(TemplateView):
                 update_result = self.update_status(selected_address_id)
                 print(f"Update result: {update_result}")
                 if update_result:
-                    return render(request, 'harvest_address_views.html', {
-                        'message': f'Successfully updated status for address {selected_address_id}',
-                        'secret_room_groups': []
-                    })
+                    # Направляем пользователя на changed_status.html с параметром selected_address_id
+                    return redirect('changed_status', selected_address_id=selected_address_id)
                 else:
+                    # Если записи не были обновлены, показать сообщение об ошибке
                     return render(request, 'harvest_address_views.html', {
-                        'error_message': f'No secret rooms found with status LOCAL at address {selected_address_id}',
+                        'error_message': f'No purchases with LOCAL status were found at this address. {selected_address_id}',
                         'secret_room_groups': []
                     })
             else:
                 print(f"selected_address_id не получен.")
+                # Предоставьте пользователю обратную связь
                 return render(request, 'harvest_address_views.html', {
                     'error_message': 'Please select an address before harvesting.',
                     'secret_room_groups': []
                 })
         else:
-            return HttpResponse(status=405)  # Method Not Allowed
+            # Если это GET-запрос, вернуть пустой ответ
+            return HttpResponse(status=405)
+
+
+class ChangedStatusView(TemplateView):
+    """Показ измененного статуса по конкретному филиалу."""
+    template_name = "changed_status.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        selected_address_id = self.kwargs.get('selected_address_id')
+        context['selected_address_id'] = selected_address_id
+        return context

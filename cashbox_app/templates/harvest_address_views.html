@@ -40,7 +40,7 @@
                     </tr>
                 {% endfor %}
             {% else %}
-                <tr><td colspan="3">No data available.</td></tr>
+                <tr><td colspan="3">Нет скупок по указанному адресу</td></tr>
             {% endif %}
         </table>
     </div>
@@ -49,7 +49,9 @@
             {% csrf_token %}
             <button type="submit">Собрать урожай</button>
         </form>
+        <button onclick="window.location.href='{% url 'supervisor' %}'">Вернуться на главную</button>
     </div>
+<!--            <a href="{% url 'supervisor' %}" class="btn btn-outline-secondary">Вернуться на главную</a>-->
 </body>
 </html>
 

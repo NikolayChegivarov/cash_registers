@@ -1271,7 +1271,6 @@ class SecretRoomView(FormView):
                 return self.dispatch(request, *args, **kwargs)
         return super().post(request, *args, **kwargs)
 
-    @method_decorator(login_required)
     def dispatch(self, request, *args, **kwargs):
         print('dispatch')
         if 'action' in request.POST:
@@ -1368,13 +1367,15 @@ class SecretRoomView(FormView):
             else:
                 return render(request, 'secret_room.html', {
                     'error_message': f'No purchases with LOCAL status were found at this address. {selected_address_id}',
-                    'secret_room_groups': []
+                    'GoldStandard': GoldStandard.objects.all(),
+                    'SecretRoom': SecretRoom.objects.filter(id_address=selected_address_id),
                 })
         else:
             print(f"selected_address_id не получен.")
             return render(request, 'secret_room.html', {
                 'error_message': 'Please select an address before harvesting.',
-                'secret_room_groups': []
+                'GoldStandard': GoldStandard.objects.all(),
+                'SecretRoom': SecretRoom.objects.filter(id_address=selected_address_id),
             })
 
     def get_success_url(self):

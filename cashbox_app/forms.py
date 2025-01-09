@@ -587,9 +587,3 @@ class SecretRoomForm(forms.ModelForm):
             "sum": "Выдано денег",
             "not_standard": "Не стандарт",
         }
-
-# class HarvestAddressForm(forms.ModelForm):
-#     class Meta:
-#         model = Address
-#         fields = ["city", "street", "home"]
-

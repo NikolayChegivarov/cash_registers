@@ -118,6 +118,8 @@ urlpatterns = [
     ),  # Показывает урожай по конкретному адресу.
     path('changed-status/<int:selected_address_id>/',
          ChangedStatusView.as_view(),
-         name='changed_status'
-    ),  # Показывает измененный адрес.
+         name='changed_status'),  # Показывает измененный адрес.
+    # path('secret_room/issue_metal/',
+    #      SecretRoomView.as_view(),
+    #      name='issue_metal'),  # Выдать металл
 ]

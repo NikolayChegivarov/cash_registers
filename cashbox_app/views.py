@@ -1258,38 +1258,157 @@ class PriceChangesView(FormView):
         return super().form_invalid(form)
 
 
+# class SecretRoomView(FormView):
+#     """
+#     Реализует логику для создания SecretRoom.
+#
+#     Attributes:
+#         template_name (str): Имя шаблона для отображения формы.
+#         success_url (str): URL, на который пользователь будет перенаправлен
+#             после успешной отправки формы.
+#         form_class (type): Класс формы для представления.
+#
+#     Methods:
+#         get_initial(): Добавляет начальные значения в форму.
+#         form_valid(): Обрабатывает валидную форму и сохраняет ее в базе данных.
+#         get_context_data(): Добавляет дополнительные данные в контекст шаблона.
+#         get_success_url(): Возвращает URL для перенаправления после успешного сохранения.
+#     """
+#
+#     template_name = "secret_room.html"
+#     success_url = reverse_lazy("secret_room")
+#     form_class = SecretRoomForm
+#
+#     def get_initial(self):
+#         print('get_initial')
+#         initial = super().get_initial()
+#         selected_address_id = self.request.session.get("selected_address_id")
+#         if selected_address_id:
+#             initial["id_address"] = Address.objects.get(id=selected_address_id)
+#         initial["author"] = self.request.user
+#         current_date = date.today().strftime("%Y-%m-%d")
+#         initial["data"] = current_date
+#         return initial
+#
+#     def form_valid(self, form):
+#         """
+#         Сохранение содержимого форм с проверкой на валидность.
+#         """
+#         print('form_valid')
+#         form.instance.author = self.request.user
+#
+#         selected_address_id = self.request.session.get("selected_address_id")
+#         if selected_address_id:
+#             try:
+#                 address = Address.objects.get(id=selected_address_id)
+#                 form.instance.id_address = address
+#             except ObjectDoesNotExist:
+#                 # Обработка случая, если адрес не найден
+#                 print(f"Адрес с id {selected_address_id} не найден.")
+#
+#         form.save()
+#         return super().form_valid(form)
+#
+#     def get_context_data(self, **kwargs):
+#         print('get_context_data')
+#         """Отправляет данные в шаблон."""
+#         selected_address_id = self.request.session.get("selected_address_id")
+#         context = super().get_context_data(**kwargs)
+#         context["GoldStandard"] = GoldStandard.objects.all()
+#         context["SecretRoom"] = SecretRoom.objects.filter(
+#             id_address=selected_address_id
+#         )
+#         print(f"context: {context}")
+#         return context
+#
+#     def update_status(self, address_id):
+#         print('update_status')
+#         """
+#         Изменяет статус скупок конкретного филиала с 'СОБРАНО' на 'ВЫДАНО'.
+#         """
+#         params = {
+#             "dbname": settings.DATABASES["default"]["NAME"],
+#             "user": settings.DATABASES["default"]["USER"],
+#             "password": settings.DATABASES["default"]["PASSWORD"],
+#             "host": settings.DATABASES["default"]["HOST"],
+#             "port": settings.DATABASES["default"]["PORT"]
+#         }
+#
+#         try:
+#             conn = psycopg2.connect(**params)
+#             cur = conn.cursor()
+#
+#             query = """
+#             UPDATE secret_room
+#             SET status = %s
+#             WHERE id_address_id = %s AND status = %s
+#             RETURNING id;
+#             """
+#
+#             cur.execute(query, (LocationStatusChoices.ISSUED.value, address_id, LocationStatusChoices.GATHER.value))
+#
+#             updated_count = cur.rowcount
+#             print(f"Обновлена.. {updated_count} ..запись")
+#
+#             conn.commit()
+#         except (Exception, psycopg2.Error) as e:
+#             print(f"Error updating status: {e}")
+#         finally:
+#             if conn:
+#                 cur.close()
+#                 conn.close()
+#
+#         return updated_count > 0  # Вернет True, если была обновлена хотя бы одна запись
+
+
+from django.shortcuts import redirect, render
+from django.urls import reverse_lazy
+from .forms import SecretRoomForm
+from .models import SecretRoom, Address
+from django.contrib.auth.decorators import login_required
+from django.utils.decorators import method_decorator
+from django.views.generic.edit import FormView
+from django.http import HttpResponse
+
+
 class SecretRoomView(FormView):
-    """
-    Реализует логику для создания SecretRoom.
-
-    Attributes:
-        template_name (str): Имя шаблона для отображения формы.
-        success_url (str): URL, на который пользователь будет перенаправлен
-            после успешной отправки формы.
-        form_class (type): Класс формы для представления.
-
-    Methods:
-        get_initial(): Добавляет начальные значения в форму.
-        form_valid(): Обрабатывает валидную форму и сохраняет ее в базе данных.
-        get_context_data(): Добавляет дополнительные данные в контекст шаблона.
-        get_success_url(): Возвращает URL для перенаправления после успешного сохранения.
-    """
-
     template_name = "secret_room.html"
     success_url = reverse_lazy("secret_room")
     form_class = SecretRoomForm
 
+    def post(self, request, *args, **kwargs):
+        if 'action' in request.POST:
+            action = request.POST['action']
+            if action == 'issue_metal':
+                return self.dispatch(request, *args, **kwargs)
+        return super().post(request, *args, **kwargs)
+
+    @method_decorator(login_required)
+    def dispatch(self, request, *args, **kwargs):
+        print('dispatch')
+        if 'action' in request.POST:
+            action = request.POST['action']
+            if action == 'issue_metal':
+                return self.handle_issue_metal(request)
+        return super().dispatch(request, *args, **kwargs)
+
     def get_initial(self):
+        print('get_initial')
         initial = super().get_initial()
         selected_address_id = self.request.session.get("selected_address_id")
         if selected_address_id:
-            initial["id_address"] = Address.objects.get(id=selected_address_id)
+            try:
+                address = Address.objects.get(id=selected_address_id)
+                initial["id_address"] = address
+            except Address.DoesNotExist:
+                print(f"Адрес с id {selected_address_id} не найден.")
         initial["author"] = self.request.user
         current_date = date.today().strftime("%Y-%m-%d")
         initial["data"] = current_date
         return initial
 
     def form_valid(self, form):
+        print('form_valid')
         form.instance.author = self.request.user
 
         selected_address_id = self.request.session.get("selected_address_id")
@@ -1297,25 +1416,81 @@ class SecretRoomView(FormView):
             try:
                 address = Address.objects.get(id=selected_address_id)
                 form.instance.id_address = address
-            except ObjectDoesNotExist:
-                # Обработка случая, если адрес не найден
+            except Address.DoesNotExist:
                 print(f"Адрес с id {selected_address_id} не найден.")
 
         form.save()
         return super().form_valid(form)
 
     def get_context_data(self, **kwargs):
-        selected_address_id = self.request.session.get("selected_address_id")
+        print('get_context_data')
         context = super().get_context_data(**kwargs)
+        selected_address_id = self.request.session.get("selected_address_id")
         context["GoldStandard"] = GoldStandard.objects.all()
-        context["SecretRoom"] = SecretRoom.objects.filter(
-            id_address=selected_address_id
-        )
-        print(f"context: {context}")
+        context["SecretRoom"] = SecretRoom.objects.filter(id_address=selected_address_id)
         return context
 
+    def update_status(self, address_id):
+        print('update_status')
+        """
+        Изменяет статус скупок конкретного филиала с 'СОБРАНО' на 'ВЫДАНО'.
+        """
+        params = {
+            "dbname": settings.DATABASES["default"]["NAME"],
+            "user": settings.DATABASES["default"]["USER"],
+            "password": settings.DATABASES["default"]["PASSWORD"],
+            "host": settings.DATABASES["default"]["HOST"],
+            "port": settings.DATABASES["default"]["PORT"]
+        }
+
+        try:
+            conn = psycopg2.connect(**params)
+            cur = conn.cursor()
+
+            query = """
+            UPDATE secret_room
+            SET status = %s
+            WHERE id_address_id = %s AND status = %s
+            RETURNING id;
+            """
+
+            cur.execute(query, (LocationStatusChoices.ISSUED.value, address_id, LocationStatusChoices.GATHER.value))
+
+            updated_count = cur.rowcount
+            print(f"Обновлена.. {updated_count} ..запись")
+
+            conn.commit()
+        except (Exception, psycopg2.Error) as e:
+            print(f"Error updating status: {e}")
+        finally:
+            if conn:
+                cur.close()
+                conn.close()
+
+        return updated_count > 0  # Вернет True, если была обновлена хотя бы одна запись
+
+    def handle_issue_metal(self, request):
+        print('handle_issue_metal')
+        selected_address_id = self.request.session.get("selected_address_id")
+        if selected_address_id:
+            update_result = self.update_status(selected_address_id)
+            print(f"Update result: {update_result}")
+            if update_result:
+                return redirect(reverse_lazy('secret_room'))
+            else:
+                return render(request, 'secret_room.html', {
+                    'error_message': f'No purchases with LOCAL status were found at this address. {selected_address_id}',
+                    'secret_room_groups': []
+                })
+        else:
+            print(f"selected_address_id не получен.")
+            return render(request, 'secret_room.html', {
+                'error_message': 'Please select an address before harvesting.',
+                'secret_room_groups': []
+            })
+
     def get_success_url(self):
-        return reverse_lazy("secret_room")
+        return self.request.path
 
 
 class HarvestView(TemplateView):

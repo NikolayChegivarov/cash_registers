@@ -1265,6 +1265,10 @@ class SecretRoomView(FormView):
     form_class = SecretRoomForm
 
     def post(self, request, *args, **kwargs):
+        """Обработка отправки формы для SecretRoomView.
+        Переопределяет метод post для добавления пользовательской логики.
+        Если параметр «action» соответствует «issue_metal», вызывается метод родительского класса dispatch.
+        Во всех остальных случаях возвращается к вызову post метода суперкласса."""
         if 'action' in request.POST:
             action = request.POST['action']
             if action == 'issue_metal':
@@ -1272,7 +1276,9 @@ class SecretRoomView(FormView):
         return super().post(request, *args, **kwargs)
 
     def dispatch(self, request, *args, **kwargs):
-        print('dispatch')
+        """
+        Реагирует на кнопку 'выдать металл', вызывая метод issue_metal.
+        """
         if 'action' in request.POST:
             action = request.POST['action']
             if action == 'issue_metal':
@@ -1280,7 +1286,7 @@ class SecretRoomView(FormView):
         return super().dispatch(request, *args, **kwargs)
 
     def get_initial(self):
-        print('get_initial')
+        """Для получения базовых форм."""
         initial = super().get_initial()
         selected_address_id = self.request.session.get("selected_address_id")
         if selected_address_id:
@@ -1295,7 +1301,9 @@ class SecretRoomView(FormView):
         return initial
 
     def form_valid(self, form):
-        print('form_valid')
+        """
+        При отправке форм, проверяет их валидность перед сохранением.
+        """
         form.instance.author = self.request.user
 
         selected_address_id = self.request.session.get("selected_address_id")
@@ -1305,12 +1313,11 @@ class SecretRoomView(FormView):
                 form.instance.id_address = address
             except Address.DoesNotExist:
                 print(f"Адрес с id {selected_address_id} не найден.")
-
         form.save()
         return super().form_valid(form)
 
     def get_context_data(self, **kwargs):
-        print('get_context_data')
+        """Создает контекст для дальнейшего использования в шаблоне."""
         context = super().get_context_data(**kwargs)
         selected_address_id = self.request.session.get("selected_address_id")
         context["GoldStandard"] = GoldStandard.objects.all()
@@ -1318,9 +1325,8 @@ class SecretRoomView(FormView):
         return context
 
     def update_status(self, address_id):
-        print('update_status')
         """
-        Изменяет статус скупок конкретного филиала с 'СОБРАНО' на 'ВЫДАНО'.
+        При вызове изменяет статус скупок конкретного филиала с 'СОБРАНО' на 'ВЫДАНО'.
         """
         params = {
             "dbname": settings.DATABASES["default"]["NAME"],
@@ -1357,7 +1363,7 @@ class SecretRoomView(FormView):
         return updated_count > 0  # Вернет True, если была обновлена хотя бы одна запись
 
     def handle_issue_metal(self, request):
-        print('handle_issue_metal')
+        """Использует метод update_status для изменения статуса отфильтрованной группы скупок."""
         selected_address_id = self.request.session.get("selected_address_id")
         if selected_address_id:
             update_result = self.update_status(selected_address_id)

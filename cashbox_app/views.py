@@ -27,6 +27,7 @@ from django.db.models import (
     Max,
     Sum,
     F,
+    Q,
 )
 from django.db.models.functions import (
     ExtractYear,
@@ -1321,7 +1322,12 @@ class SecretRoomView(FormView):
         context = super().get_context_data(**kwargs)
         selected_address_id = self.request.session.get("selected_address_id")
         context["GoldStandard"] = GoldStandard.objects.all()
-        context["SecretRoom"] = SecretRoom.objects.filter(id_address=selected_address_id)
+        local_status = LocationStatusChoices.LOCAL.value
+        gather_status = LocationStatusChoices.GATHER.value
+        context["SecretRoom"] = SecretRoom.objects.filter(
+            id_address=selected_address_id,
+            status__in=[local_status, gather_status]
+        ).order_by('shift_date')
         return context
 
     def update_status(self, address_id):
@@ -1386,6 +1392,52 @@ class SecretRoomView(FormView):
 
     def get_success_url(self):
         return self.request.path
+
+
+class CollectedMetalView(TemplateView):
+    """Показывает собранный металл."""
+    template_name = "сollected_metal.html"
+    form_class = SecretRoomForm
+
+    def get_initial(self):
+        """Для получения базовых форм."""
+        initial = super().get_initial()
+        selected_address_id = self.request.session.get("selected_address_id")
+        if selected_address_id:
+            try:
+                address = Address.objects.get(id=selected_address_id)
+                initial["id_address"] = address
+            except Address.DoesNotExist:
+                print(f"Адрес с id {selected_address_id} не найден.")
+        initial["author"] = self.request.user
+        current_date = date.today().strftime("%Y-%m-%d")
+        initial["data"] = current_date
+        return initial
+
+    def get_context_data(self, **kwargs):
+        """Создает контекст для дальнейшего использования в шаблоне."""
+        context = super().get_context_data(**kwargs)
+        selected_address_id = self.request.session.get("selected_address_id")
+        context["GoldStandard"] = GoldStandard.objects.all()
+        issued_status = LocationStatusChoices.ISSUED.value
+        context["SecretRoom"] = SecretRoom.objects.filter(
+            id_address=selected_address_id,
+            status__in=[issued_status]
+        ).order_by('shift_date')
+        # context["SecretRoom"] = SecretRoom.objects.filter(
+        #     status=issued_status,
+        #     id_address_id=selected_address_id
+        #     ).values('gold_standard').annotate(
+        #     total_weight_clean=Sum('weight_clean'),
+        #     total_weight_fact=Sum('weight_fact')
+        #     )
+        #
+        # # Преобразуем QuerySet в DataFrame
+        # df = pd.DataFrame(context["SecretRoom"])
+        # # Выводим результат в консоль
+        # print(df.to_string(index=False))
+
+        return context
 
 
 class HarvestView(TemplateView):
@@ -1631,3 +1683,7 @@ class ChangedStatusView(TemplateView):
         selected_address_id = self.kwargs.get('selected_address_id')
         context['selected_address_id'] = selected_address_id
         return context
+
+
+
+

@@ -1,0 +1,31 @@
+{% block content %}
+<head>
+    <meta charset="UTF-8">
+    <title>Посмотреть собранный металл</title>
+
+    <style>
+    </style>
+
+</head>
+
+<form method="post">
+    {% csrf_token %}
+    <input type="hidden" name="next" value="{{ next }}">
+    <fieldset>
+        <legend>Информация</legend>
+        <div>
+            <label>Сотрудник смены:</label>
+            {{form.author}}
+        </div>
+        <div>
+            <label>Адрес:</label>
+            {{form.id_address}}
+        </div>
+        <div>
+            <label>Дата:</label>
+            {{form.data}}
+        </div>
+    </fieldset>
+</form>
+
+{% endblock %}

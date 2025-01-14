@@ -3,29 +3,24 @@
     <meta charset="UTF-8">
     <title>Посмотреть собранный металл</title>
 
-    <style>
-    </style>
-
 </head>
 
-<form method="post">
-    {% csrf_token %}
-    <input type="hidden" name="next" value="{{ next }}">
-    <fieldset>
-        <legend>Информация</legend>
-        <div>
-            <label>Сотрудник смены:</label>
-            {{form.author}}
-        </div>
-        <div>
-            <label>Адрес:</label>
-            {{form.id_address}}
-        </div>
-        <div>
-            <label>Дата:</label>
-            {{form.data}}
-        </div>
-    </fieldset>
-</form>
+<table class="collected_metal">
+    <tr>
+        <th colspan="3">Посмотреть собранный металл:</th>
+    </tr>
+    <tr>
+        <th>Проба</th>
+        <th>Чистый вес</th>
+        <th>Фактический вес</th>
+    </tr>
+    {% for item in SecretRoom %}
+    <tr>
+        <td>{{ item.gold_standard }}</td>
+        <td>{{ item.total_weight_clean }}</td>
+        <td>{{ item.total_weight_fact }}</td>
+    </tr>
+    {% endfor %}
+</table>
 
 {% endblock %}

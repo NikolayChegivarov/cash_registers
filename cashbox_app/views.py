@@ -1398,44 +1398,51 @@ class CollectedMetalView(TemplateView):
     """Показывает собранный металл."""
     template_name = "сollected_metal.html"
     form_class = SecretRoomForm
+    print("CollectedMetalView сработал.")
 
     def get_initial(self):
-        """Для получения базовых форм."""
+        print("get_initial() called")
         initial = super().get_initial()
+
         selected_address_id = self.request.session.get("selected_address_id")
+        print(f'selected_address_id: {selected_address_id}')
         if selected_address_id:
             try:
                 address = Address.objects.get(id=selected_address_id)
                 initial["id_address"] = address
+                print(f'initial["id_address"]: {initial["id_address"]}')
             except Address.DoesNotExist:
                 print(f"Адрес с id {selected_address_id} не найден.")
+
         initial["author"] = self.request.user
         current_date = date.today().strftime("%Y-%m-%d")
         initial["data"] = current_date
+
+        print(f"Initial data: {initial}")
         return initial
 
     def get_context_data(self, **kwargs):
         """Создает контекст для дальнейшего использования в шаблоне."""
         context = super().get_context_data(**kwargs)
         selected_address_id = self.request.session.get("selected_address_id")
-        context["GoldStandard"] = GoldStandard.objects.all()
-        issued_status = LocationStatusChoices.ISSUED.value
+        print(f"selected_address_id_________{selected_address_id}")
+
+        gather_status = LocationStatusChoices.GATHER.value
+        print(f"issued_status___{gather_status}")
+
         context["SecretRoom"] = SecretRoom.objects.filter(
-            id_address=selected_address_id,
-            status__in=[issued_status]
-        ).order_by('shift_date')
-        # context["SecretRoom"] = SecretRoom.objects.filter(
-        #     status=issued_status,
-        #     id_address_id=selected_address_id
-        #     ).values('gold_standard').annotate(
-        #     total_weight_clean=Sum('weight_clean'),
-        #     total_weight_fact=Sum('weight_fact')
-        #     )
-        #
-        # # Преобразуем QuerySet в DataFrame
-        # df = pd.DataFrame(context["SecretRoom"])
-        # # Выводим результат в консоль
-        # print(df.to_string(index=False))
+            status=gather_status,
+            id_address_id=selected_address_id
+            ).values('gold_standard').annotate(
+            total_weight_clean=Sum('weight_clean'),
+            total_weight_fact=Sum('weight_fact')
+            )
+
+        # Преобразуем QuerySet в DataFrame
+        df = pd.DataFrame(context["SecretRoom"])
+        # Выводим результат в консоль
+        print(df.to_string(index=False))
+        print(f'context: {context}')
 
         return context
 

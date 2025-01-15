@@ -1438,6 +1438,11 @@ class CollectedMetalView(TemplateView):
             total_weight_fact=Sum('weight_fact')
             )
 
+        context["Total_Price"] = SecretRoom.objects.filter(
+            status=gather_status,
+            id_address_id=selected_address_id
+        ).aggregate(Sum('sum'))['sum__sum']
+
         # Преобразуем QuerySet в DataFrame
         df = pd.DataFrame(context["SecretRoom"])
         # Выводим результат в консоль

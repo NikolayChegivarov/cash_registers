@@ -3,11 +3,38 @@
     <meta charset="UTF-8">
     <title>Посмотреть собранный металл</title>
 
+    <style>
+        table {
+            margin: 0 auto;
+            max-width: 800px;
+            border-collapse: collapse;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        table th, table td {
+            padding: 12px;
+            text-align: center;
+            font-size: 16px;
+        }
+
+        table th {
+            background-color: #f2f2f2;
+        }
+
+        .collected_metal {
+            margin-bottom: 20px;
+        }
+
+        .Total_Price {
+            font-weight: bold;
+        }
+    </style>
+
 </head>
 
 <table class="collected_metal">
     <tr>
-        <th colspan="3">Посмотреть собранный металл:</th>
+        <th colspan="3">Здесь указан суммарный вес по пробам и сумма выданных денег собранного металла:</th>
     </tr>
     <tr>
         <th>Проба</th>
@@ -22,5 +49,20 @@
     </tr>
     {% endfor %}
 </table>
+<table class="Total_Price">
+    <tr>
+        <th>Сумма</th>
+    </tr>
+    <tr>
+        <td>{{ Total_Price }}</td>
+    </tr>
+</table>
+<div class="buttons">
+    <button type="button" class="btn btn-primary" onclick="window.location.href='/secret_room/'; return false;">
+        Назад
+    </button>
+</div>
+</form>
+
 
 {% endblock %}

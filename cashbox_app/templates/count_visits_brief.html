@@ -1,10 +1,15 @@
-<!DOCTYPE html>
-<html lang="ru">
+{% load static %}
+
+{% block content %}
 <head>
     <meta charset="UTF-8">
     <title>Краткий отчет</title>
     <style>
         body {
+            background-image: url('{% static "cashbox_app/statuc.png" %}');
+            background-size: 100% auto;
+            background-repeat: no-repeat;
+            background-position: center;
             font-family: Arial, sans-serif;
             line-height: 1.6;
             margin: 0;
@@ -38,6 +43,7 @@
 </head>
 <body>
 <h1>Краткий отчет</h1>
+<h3>Количество посещений</h3>
 <form method="post">
     {% csrf_token %}
     {{ form.as_p }}
@@ -66,4 +72,5 @@
 {% endif %}
 
 </body>
-</html>
+
+{% endblock %}

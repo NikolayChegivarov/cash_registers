@@ -19,19 +19,29 @@
             top: 10%;
             left: 5%;
             z-index: 1000;
-        }
-        .buttons {   /* Поле кнопок. */
-            position: fixed;
-            bottom: 10%;
-            left: 5%;
-            z-index: 1000;
-            font-size: 16px;
-            padding: 5px 10px;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            color: gray;
         }
         .buttons button {
-            cursor: pointer;  Изменить форму курсора при наведении */
+            cursor: pointer;
+            transition: all 0.3s ease; /* Эффект перехода */
+            background-color: #ffd700; /* Золотой фон кнопки */
+            color: black;
+            border: none;
+            padding: 10px 15px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 14px;
+            margin: 4px 2px;
+            border-radius: 4px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .buttons button:hover {
+            background-color: #d6b300; /* Темнее золотой цвет при наведении */
+            transform: translateY(-2px); /* Плавный подъем кнопки */
+            box-shadow: 0 5px 10px rgba(0,0,0,0.3);
+<!--            cursor: pointer;  Изменить форму курсора при наведении */-->
         }
     </style>
 </head>

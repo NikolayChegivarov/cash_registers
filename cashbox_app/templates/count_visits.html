@@ -1,20 +1,47 @@
-<!DOCTYPE html>
-<html lang="en">
+{% load static %}
+
+{% block content %}
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
     <title>Выбор отчета</title>
+    <style>
+        body {
+            background-image: url('{% static "cashbox_app/maxresdefault.jpg" %}');
+            background-size: 100% auto;
+            background-repeat: no-repeat;
+            background-position: center;
+            margin: 0;
+            padding: 20px;
+        }
+        h1 {
+            color: green;
+        }
+        h3:first-of-type {
+            color: red;
+        }
+        h3:last-of-type {
+            color: blue;
+        }
+        .year-label,
+        .month-label {
+            color: green;
+        }
+    </style>
 </head>
 <body>
-<h1>Выбирите разновидность отчета. При необходимости измените дату:</h1>
+    <h1>Выберите разновидность отчета. При необходимости измените дату:</h1>
+    <h3>Краткий отчет укажет вам количество рабочих дней сотрудника</h3>
+    <h3>Полный отчет покажет даты выхода сотрудника на работу</h3>
 
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
 
-    <input type="submit" name="action" value="Краткий отчет"/>
-    <input type="submit" name="action" value="Полный отчет"/>
-    <button type="button" onclick="window.location.href='{% url 'supervisor'%}'">На главную</button>
-</form>
+        <input type="submit" name="action" value="Краткий отчет"/>
+        <input type="submit" name="action" value="Полный отчет"/>
+        <button type="button" onclick="window.location.href='{% url 'supervisor'%}'">На главную</button>
+    </form>
 </body>
 </html>
-
+{% endblock %}

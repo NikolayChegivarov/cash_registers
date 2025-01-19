@@ -34,6 +34,7 @@ STATICFILES_DIRS = [
 ]
 
 ALLOWED_HOSTS = ["192.168.20.123", "134.19.147.175", "localhost", "127.0.0.1"]
+PORT = 8001
 
 # Application definition
 

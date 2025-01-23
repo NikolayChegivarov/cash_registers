@@ -360,6 +360,7 @@ class PriceGoldStandard(models.Model):
         logger.debug(f"Price updated successfully. New price: {new_price}")
         self.save()
 
+
 def probe_converter_gold(weight, gold_standard):
     gold_sample858 = 585
 

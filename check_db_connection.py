@@ -12,3 +12,5 @@ class Command(BaseCommand):
 
 if __name__ == '__main__':
     Command().handle(None, None)
+
+# python manage.py database_connection_check

@@ -328,7 +328,7 @@ class GoldStandard(models.Model):
     class Meta:
         db_table = "gold_standard"
         verbose_name = "Цена на лом"
-        ordering = ["gold_standard"]
+        ordering = ["shift_date"]
 
 
 def probe_converter_gold(weight, gold_standard):

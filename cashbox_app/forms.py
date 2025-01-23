@@ -5,7 +5,7 @@ from cashbox_app.models import (
     CashReportStatusChoices,
     CashRegisterChoices,
     SecretRoom,
-    GoldStandard, GoldStandardChoices,
+    PriceGoldStandard, GoldStandardChoices,
 )
 from datetime import datetime, timedelta
 from django import forms
@@ -475,7 +475,7 @@ def price_changes():
     }
 
     for standard_type in gold_standard.keys():
-        obj_list = GoldStandard.objects.filter(gold_standard=standard_type).order_by("shift_date")
+        obj_list = PriceGoldStandard.objects.filter(gold_standard=standard_type).order_by("shift_date")
 
         if obj_list:
             latest_obj = obj_list.last()
@@ -491,7 +491,7 @@ class PriceChangesForm(forms.Form):
         max_digits=10,
         decimal_places=2,
         required=False,
-        initial=GoldStandard.objects.filter(gold_standard=375).first().price_rubles if GoldStandard.objects.filter(
+        initial=PriceGoldStandard.objects.filter(gold_standard=375).first().price_rubles if PriceGoldStandard.objects.filter(
             gold_standard=375).exists() else None,
         label="золото 375",
     )
@@ -499,7 +499,7 @@ class PriceChangesForm(forms.Form):
         max_digits=10,
         decimal_places=2,
         required=False,
-        initial=GoldStandard.objects.filter(gold_standard=500).first().price_rubles if GoldStandard.objects.filter(
+        initial=PriceGoldStandard.objects.filter(gold_standard=500).first().price_rubles if PriceGoldStandard.objects.filter(
             gold_standard=500).exists() else None,
         label="золото 500",
     )
@@ -507,7 +507,7 @@ class PriceChangesForm(forms.Form):
         max_digits=10,
         decimal_places=2,
         required=False,
-        initial=GoldStandard.objects.filter(gold_standard=585).first().price_rubles if GoldStandard.objects.filter(
+        initial=PriceGoldStandard.objects.filter(gold_standard=585).first().price_rubles if PriceGoldStandard.objects.filter(
             gold_standard=585).exists() else None,
         label="золото 585",
     )
@@ -515,7 +515,7 @@ class PriceChangesForm(forms.Form):
         max_digits=10,
         decimal_places=2,
         required=False,
-        initial=GoldStandard.objects.filter(gold_standard=750).first().price_rubles if GoldStandard.objects.filter(
+        initial=PriceGoldStandard.objects.filter(gold_standard=750).first().price_rubles if PriceGoldStandard.objects.filter(
             gold_standard=750).exists() else None,
         label="золото 750",
     )
@@ -523,7 +523,7 @@ class PriceChangesForm(forms.Form):
         max_digits=10,
         decimal_places=2,
         required=False,
-        initial=GoldStandard.objects.filter(gold_standard=875).first().price_rubles if GoldStandard.objects.filter(
+        initial=PriceGoldStandard.objects.filter(gold_standard=875).first().price_rubles if PriceGoldStandard.objects.filter(
             gold_standard=875).exists() else None,
         label="серебро 875",
     )
@@ -531,7 +531,7 @@ class PriceChangesForm(forms.Form):
         max_digits=10,
         decimal_places=2,
         required=False,
-        initial=GoldStandard.objects.filter(gold_standard=925).first().price_rubles if GoldStandard.objects.filter(
+        initial=PriceGoldStandard.objects.filter(gold_standard=925).first().price_rubles if PriceGoldStandard.objects.filter(
             gold_standard=925).exists() else None,
         label="серебро 925",
     )

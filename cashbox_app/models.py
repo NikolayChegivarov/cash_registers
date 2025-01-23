@@ -305,7 +305,7 @@ class GoldStandardChoices(models.IntegerChoices):
     SILVER875 = 875, "СЕРЕБРО 875"
 
 
-class GoldStandard(models.Model):
+class PriceGoldStandard(models.Model):
     """Цена на металл."""
 
     shift_date = models.DateTimeField(auto_now=True, verbose_name="Дата изменения цены")
@@ -326,7 +326,7 @@ class GoldStandard(models.Model):
         )
 
     class Meta:
-        db_table = "gold_standard"
+        db_table = "price_gold_standard"
         verbose_name = "Цена на лом"
         ordering = ["shift_date"]
 

@@ -53,7 +53,7 @@ from cashbox_app.models import (
     CashReportStatusChoices,
     CustomUser,
     Schedule,
-    GoldStandard,
+    PriceGoldStandard,
     SecretRoom,
 )
 from datetime import date
@@ -1228,7 +1228,7 @@ class PriceChangesView(FormView):
                 if key.startswith(('gold_', 'silver_')):
                     numeric_key = extract_and_convert(key)
                     try:
-                        instance, created = GoldStandard.objects.get_or_create(
+                        instance, created = PriceGoldStandard.objects.get_or_create(
                             gold_standard=numeric_key,
                             defaults={'price_rubles': None, 'shift_date': timezone.now()}
                         )
@@ -1245,14 +1245,14 @@ class PriceChangesView(FormView):
 
                             instance.shift_date = timezone.now()
                             instance.save(update_fields=['price_rubles', 'shift_date'])
-                    except GoldStandard.DoesNotExist:
+                    except PriceGoldStandard.DoesNotExist:
                         logger.error(f"Записи не найдены для {numeric_key}, создание нового записи.")
 
         return super().form_valid(form)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["tabl"] = GoldStandard.objects.all()
+        context["tabl"] = PriceGoldStandard.objects.all()
         return context
 
     def form_invalid(self, form):
@@ -1321,7 +1321,7 @@ class SecretRoomView(FormView):
         """Создает контекст для дальнейшего использования в шаблоне."""
         context = super().get_context_data(**kwargs)
         selected_address_id = self.request.session.get("selected_address_id")
-        context["GoldStandard"] = GoldStandard.objects.all()
+        context["GoldStandard"] = PriceGoldStandard.objects.all()
         local_status = LocationStatusChoices.LOCAL.value
         gather_status = LocationStatusChoices.GATHER.value
         context["SecretRoom"] = SecretRoom.objects.filter(
@@ -1379,14 +1379,14 @@ class SecretRoomView(FormView):
             else:
                 return render(request, 'secret_room.html', {
                     'error_message': f'No purchases with LOCAL status were found at this address. {selected_address_id}',
-                    'GoldStandard': GoldStandard.objects.all(),
+                    'GoldStandard': PriceGoldStandard.objects.all(),
                     'SecretRoom': SecretRoom.objects.filter(id_address=selected_address_id),
                 })
         else:
             print(f"selected_address_id не получен.")
             return render(request, 'secret_room.html', {
                 'error_message': 'Please select an address before harvesting.',
-                'GoldStandard': GoldStandard.objects.all(),
+                'GoldStandard': PriceGoldStandard.objects.all(),
                 'SecretRoom': SecretRoom.objects.filter(id_address=selected_address_id),
             })
 

@@ -124,4 +124,4 @@ urlpatterns = [
 #     path('changed-status/<int:selected_address_id>/',
 #          ChangedStatusView.as_view(),
 #          name='changed_status'),  # Показывает измененный адрес.
-# ]
+]

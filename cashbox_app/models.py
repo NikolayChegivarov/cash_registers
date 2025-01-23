@@ -326,7 +326,7 @@ class PriceGoldStandard(models.Model):
         )
 
     class Meta:
-        db_table = "price_gold_standard"
+        # db_table = "price_gold_standard"
         verbose_name = "Цена на лом"
         ordering = ["shift_date"]
 

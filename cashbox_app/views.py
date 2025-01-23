@@ -1,181 +1,181 @@
-# from django.contrib.auth.decorators import login_required
-# from django.contrib.auth.views import LoginView
-# from django.contrib.auth.mixins import LoginRequiredMixin
-# from django.contrib.auth import login, authenticate
-# from django.conf import settings
-# from django.core.exceptions import ObjectDoesNotExist
-# from django.http import Http404, HttpResponse
-# from django.shortcuts import render, redirect
-# from django.views import View
-# from django.views.generic import FormView, TemplateView
-# from django.views.decorators.csrf import csrf_protect
-# from django.utils.decorators import method_decorator
-# from django.utils.timezone import now
-# from django.utils import timezone
-# from django.urls import reverse_lazy, reverse
-# from django.db import transaction
-# from django.db.models.fields import CharField
-# from django.db.models import (
-#     Prefetch,
-#     Subquery,
-#     OuterRef,
-#     Value,
-#     Count,
-#     When,
-#     Func,
-#     Case,
-#     Max,
-#     Sum,
-#     F,
-#     Q,
-# )
-# from django.db.models.functions import (
-#     ExtractYear,
-#     ExtractMonth,
-#     ExtractDay,
-#     ExtractWeekDay,
-# )
-# from cashbox_app.forms import (
-#     CustomAuthenticationForm,
-#     AddressSelectionForm,
-#     SavedForm,
-#     MultiCashReportForm,
-#     YearMonthForm,
-#     ScheduleForm,
-#     SecretRoomForm,
-#     PriceChangesForm,
-# )
-# from cashbox_app.models import (
-#     Address,
-#     LocationStatusChoices,
-#     CashReport,
-#     CashRegisterChoices,
-#     CashReportStatusChoices,
-#     CustomUser,
-#     Schedule,
-#     GoldStandard,
-#     SecretRoom,
-# )
-# from datetime import date
-# import pandas as pd
-# import psycopg2
-# import logging
-#
-#
-# logger = logging.getLogger(__name__)
-# logging.basicConfig(level=logging.DEBUG)
-#
-# # Увеличиваем максимальное количество отображаемых столбцов в pandas
-# pd.set_option("display.max_columns", None)
-# # Увеличиваем ширину вывода в pandas
-# pd.set_option("display.width", 1000)
-#
-#
-# def current_balance(address_id):
-#     """Функция для получения текущего баланса кассы"""
-#     # Создаю словарь с балансами касс.
-#     balance = {"buying_up": None, "pawnshop": None, "technique": None}
-#
-#     # BUYING_UP ORM зарос
-#     buying_up_reports_BUYING_UP = (
-#         CashReport.objects.filter(
-#             cas_register=CashRegisterChoices.BUYING_UP, id_address_id=address_id
-#         )
-#         .values("cash_register_end")
-#         .annotate(last_updated=Max("updated_at"))
-#         .order_by("-last_updated")
-#         .first()
-#     )
-#
-#     if buying_up_reports_BUYING_UP:
-#         # Если результат есть, добавляю его в словарь.
-#         balance["buying_up"] = buying_up_reports_BUYING_UP["cash_register_end"]
-#         print(f"Текущий баланс BUYING_UP: {balance.get('buying_up')}")
-#     else:
-#         # Если значения нет. Устанавливаю 0
-#         balance["buying_up"] = 0
-#         print(f"Отчетов по Скупке для адреса {address_id} не найдено")
-#
-#     # PAWNSHOP ORM зарос
-#     buying_up_reports_PAWNSHOP = (
-#         CashReport.objects.filter(
-#             cas_register=CashRegisterChoices.PAWNSHOP, id_address_id=address_id
-#         )
-#         .values("cash_register_end")
-#         .annotate(last_updated=Max("updated_at"))
-#         .order_by("-last_updated")
-#         .first()
-#     )
-#
-#     if buying_up_reports_PAWNSHOP:
-#         balance["pawnshop"] = buying_up_reports_PAWNSHOP["cash_register_end"]
-#         print(f"Текущий баланс PAWNSHOP: {balance.get('pawnshop')}")
-#     else:
-#         balance["pawnshop"] = 0
-#         print(f"Отчетов по Ломбарду для адреса {address_id} не найдено")
-#
-#     # TECHNIQUE ORM зарос
-#     buying_up_reports_TECHNIQUE = (
-#         CashReport.objects.filter(
-#             cas_register=CashRegisterChoices.TECHNIQUE, id_address_id=address_id
-#         )
-#         .values("cash_register_end")
-#         .annotate(last_updated=Max("updated_at"))
-#         .order_by("-last_updated")
-#         .first()
-#     )
-#
-#     if buying_up_reports_TECHNIQUE:
-#         balance["technique"] = buying_up_reports_TECHNIQUE["cash_register_end"]
-#         print(f"Текущий баланс TECHNIQUE: {balance.get('technique')}")
-#     else:
-#         balance["technique"] = 0
-#         print(f"Отчетов по Технике для адреса {address_id} не найдено")
-#
-#     return balance
-#
-#
-# class CustomLoginView(LoginView):
-#     """Представление для авторизации."""
-#
-#     template_name = "login.html"
-#     form_class = CustomAuthenticationForm
-#
-#     # success_url = reverse_lazy('address_selection')  # .html
-#
-#     def form_valid(self, form):
-#         """
-#         Проверяет валидность формы и выполняет действия при успешной валидации.
-#
-#         Этот метод вызывается после того, как форма была успешно валидирана.
-#         Он проверяет данные формы, выводит имя пользователя и затем передает управление родительскому классу.
-#
-#         :param form: Объект формы Django, содержащий очищенные данные
-#         :return: True, если форма валидна, False в противном случае
-#         """
-#         username = form.cleaned_data.get("username")
-#         password = form.cleaned_data.get("password")
-#
-#         # Authenticate the user
-#         user = authenticate(username=username, password=password)
-#
-#         if user is not None:
-#             login(self.request, user)
-#
-#             user_str = str(user.username)
-#
-#             print(f"Вошел пользователь: {user_str}")
-#
-#             if user_str == "Руководитель":
-#                 return redirect(reverse_lazy("supervisor"))
-#             else:
-#                 return redirect(reverse_lazy("address_selection"))
-#         else:
-#             # Handle invalid credentials
-#             print("Неверные учетные данные")
-#             return self.form_invalid(form)
-#
-#
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.views import LoginView
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth import login, authenticate
+from django.conf import settings
+from django.core.exceptions import ObjectDoesNotExist
+from django.http import Http404, HttpResponse
+from django.shortcuts import render, redirect
+from django.views import View
+from django.views.generic import FormView, TemplateView
+from django.views.decorators.csrf import csrf_protect
+from django.utils.decorators import method_decorator
+from django.utils.timezone import now
+from django.utils import timezone
+from django.urls import reverse_lazy, reverse
+from django.db import transaction
+from django.db.models.fields import CharField
+from django.db.models import (
+    Prefetch,
+    Subquery,
+    OuterRef,
+    Value,
+    Count,
+    When,
+    Func,
+    Case,
+    Max,
+    Sum,
+    F,
+    Q,
+)
+from django.db.models.functions import (
+    ExtractYear,
+    ExtractMonth,
+    ExtractDay,
+    ExtractWeekDay,
+)
+from cashbox_app.forms import (
+    CustomAuthenticationForm,
+    AddressSelectionForm,
+    SavedForm,
+    MultiCashReportForm,
+    YearMonthForm,
+    ScheduleForm,
+    SecretRoomForm,
+    PriceChangesForm,
+)
+from cashbox_app.models import (
+    Address,
+    LocationStatusChoices,
+    CashReport,
+    CashRegisterChoices,
+    CashReportStatusChoices,
+    CustomUser,
+    Schedule,
+    GoldStandard,
+    SecretRoom,
+)
+from datetime import date
+import pandas as pd
+import psycopg2
+import logging
+
+
+logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.DEBUG)
+
+# Увеличиваем максимальное количество отображаемых столбцов в pandas
+pd.set_option("display.max_columns", None)
+# Увеличиваем ширину вывода в pandas
+pd.set_option("display.width", 1000)
+
+
+def current_balance(address_id):
+    """Функция для получения текущего баланса кассы"""
+    # Создаю словарь с балансами касс.
+    balance = {"buying_up": None, "pawnshop": None, "technique": None}
+
+    # BUYING_UP ORM зарос
+    buying_up_reports_BUYING_UP = (
+        CashReport.objects.filter(
+            cas_register=CashRegisterChoices.BUYING_UP, id_address_id=address_id
+        )
+        .values("cash_register_end")
+        .annotate(last_updated=Max("updated_at"))
+        .order_by("-last_updated")
+        .first()
+    )
+
+    if buying_up_reports_BUYING_UP:
+        # Если результат есть, добавляю его в словарь.
+        balance["buying_up"] = buying_up_reports_BUYING_UP["cash_register_end"]
+        print(f"Текущий баланс BUYING_UP: {balance.get('buying_up')}")
+    else:
+        # Если значения нет. Устанавливаю 0
+        balance["buying_up"] = 0
+        print(f"Отчетов по Скупке для адреса {address_id} не найдено")
+
+    # PAWNSHOP ORM зарос
+    buying_up_reports_PAWNSHOP = (
+        CashReport.objects.filter(
+            cas_register=CashRegisterChoices.PAWNSHOP, id_address_id=address_id
+        )
+        .values("cash_register_end")
+        .annotate(last_updated=Max("updated_at"))
+        .order_by("-last_updated")
+        .first()
+    )
+
+    if buying_up_reports_PAWNSHOP:
+        balance["pawnshop"] = buying_up_reports_PAWNSHOP["cash_register_end"]
+        print(f"Текущий баланс PAWNSHOP: {balance.get('pawnshop')}")
+    else:
+        balance["pawnshop"] = 0
+        print(f"Отчетов по Ломбарду для адреса {address_id} не найдено")
+
+    # TECHNIQUE ORM зарос
+    buying_up_reports_TECHNIQUE = (
+        CashReport.objects.filter(
+            cas_register=CashRegisterChoices.TECHNIQUE, id_address_id=address_id
+        )
+        .values("cash_register_end")
+        .annotate(last_updated=Max("updated_at"))
+        .order_by("-last_updated")
+        .first()
+    )
+
+    if buying_up_reports_TECHNIQUE:
+        balance["technique"] = buying_up_reports_TECHNIQUE["cash_register_end"]
+        print(f"Текущий баланс TECHNIQUE: {balance.get('technique')}")
+    else:
+        balance["technique"] = 0
+        print(f"Отчетов по Технике для адреса {address_id} не найдено")
+
+    return balance
+
+
+class CustomLoginView(LoginView):
+    """Представление для авторизации."""
+
+    template_name = "login.html"
+    form_class = CustomAuthenticationForm
+
+    # success_url = reverse_lazy('address_selection')  # .html
+
+    def form_valid(self, form):
+        """
+        Проверяет валидность формы и выполняет действия при успешной валидации.
+
+        Этот метод вызывается после того, как форма была успешно валидирана.
+        Он проверяет данные формы, выводит имя пользователя и затем передает управление родительскому классу.
+
+        :param form: Объект формы Django, содержащий очищенные данные
+        :return: True, если форма валидна, False в противном случае
+        """
+        username = form.cleaned_data.get("username")
+        password = form.cleaned_data.get("password")
+
+        # Authenticate the user
+        user = authenticate(username=username, password=password)
+
+        if user is not None:
+            login(self.request, user)
+
+            user_str = str(user.username)
+
+            print(f"Вошел пользователь: {user_str}")
+
+            if user_str == "Руководитель":
+                return redirect(reverse_lazy("supervisor"))
+            else:
+                return redirect(reverse_lazy("address_selection"))
+        else:
+            # Handle invalid credentials
+            print("Неверные учетные данные")
+            return self.form_invalid(form)
+
+
 # class AddressSelectionView(FormView):
 #     """Представление для выбора адреса."""
 #

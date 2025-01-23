@@ -2,6 +2,10 @@
 .env
 /.idea/
 __pycache__/
-/cashbox_app/migrations/*
-!/cashbox_app/migrations/
+#/cashbox_app/migrations/*
+#!/cashbox_app/migrations/
+# Игнорировать все файлы и папки внутри migrations
+migrations/*
+# Исключить саму папку migrations из игнора
+!migrations/
 DRAFT.md

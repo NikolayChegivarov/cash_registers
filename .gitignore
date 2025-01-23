@@ -3,5 +3,5 @@
 /.idea/
 __pycache__/
 /cashbox_app/migrations/*
-!/cashbox_app/migrations/__init__.py
+!/cashbox_app/migrations/
 DRAFT.md

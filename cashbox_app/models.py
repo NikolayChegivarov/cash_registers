@@ -5,9 +5,6 @@ from django.contrib.auth.models import (
     PermissionsMixin,
 )
 
-import logging
-logger = logging.getLogger(__name__)
-
 
 class Address(models.Model):
     """Модель с адресами."""
@@ -323,42 +320,10 @@ class PriceGoldStandard(models.Model):
 
     objects = models.Manager()
 
-    def __init__(self, *args, **kwargs):
-        logger.debug(f"Initializing PriceGoldStandard object: {args}, {kwargs}")
-
-    def __str__(self):
-        return (
-            f"Значение пробы {self.gold_standard} стоимость {self.price_rubles} рублей"
-        )
-
     class Meta:
         db_table = "price_gold_standard"
         verbose_name = "Цена на лом"
         ordering = ["shift_date"]
-
-    def save(self, *args, **kwargs):
-        logger.info(f"Saving PriceGoldStandard object: {self.id}")
-
-        super().save(*args, **kwargs)
-        logger.debug(f"PriceGoldStandard saved successfully. ID: {self.id}")
-
-    @classmethod
-    def create(cls, gold_standard=None, price_rubles=None, **extra_fields):
-        logger.debug(
-            f"Creating new PriceGoldStandard instance. Gold standard: {gold_standard}, Price rubles: {price_rubles}")
-        if gold_standard is None or price_rubles is None:
-            raise ValueError("Both gold_standard and price_rubles must be provided")
-
-        instance = cls(gold_standard=gold_standard, price_rubles=price_rubles, **extra_fields)
-        logger.debug(f"Created PriceGoldStandard instance: {instance}")
-
-        return instance
-
-    def update_price(self, new_price):
-        logger.info(f"Updating price for PriceGoldStandard object with ID: {self.id}")
-        self.price_rubles = new_price
-        logger.debug(f"Price updated successfully. New price: {new_price}")
-        self.save()
 
 
 def probe_converter_gold(weight, gold_standard):

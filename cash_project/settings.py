@@ -91,7 +91,9 @@ DATABASES = {
         "USER": os.getenv("USER_POSTGRES"),
         "PASSWORD": os.getenv("PASSWORD"),
         # "OPTIONS": {"client_encoding": "UTF8", "options": "-c search_path=lombards"},
-        'OPTIONS': {'init_command': "SET search_path TO public, extensions"},
+        'OPTIONS': {
+            'init_command': "SET search_path TO public, extensions",
+        },
         # "SCHEMA": "lombards",
     }
 }

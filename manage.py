@@ -2,6 +2,7 @@
 """Django's command-line utility for administrative tasks."""
 import os
 import sys
+sys.path.append('D:/it/project/cash_registers')
 
 
 def main():

@@ -3,3 +3,8 @@
 /.idea/
 __pycache__/
 DRAFT.md
+# Игнорировать все файлы и папки внутри migrations/
+/cashbox_app/migrations/*
+
+# Исключить саму папку migrations/
+!cashbox_app/migrations/

@@ -1189,12 +1189,6 @@ class SupervisorCashReportView(TemplateView):  # Не доделан.
     template_name = "supervisor_cash_report.html"
 
 
-class SupervisorCashReportView(TemplateView):  # Не доделан.
-    """Отчет по кассам."""
-
-    template_name = "supervisor_cash_report.html"
-
-
 def extract_and_convert(key):
     value_part = key.split('_')[1]
     return int(value_part)
@@ -1453,6 +1447,7 @@ class CollectedMetalView(TemplateView):
 
 
 class HarvestView(TemplateView):
+    """Меню скупок."""
     template_name = "harvest.html"
 
 
@@ -1695,7 +1690,3 @@ class ChangedStatusView(TemplateView):
         selected_address_id = self.kwargs.get('selected_address_id')
         context['selected_address_id'] = selected_address_id
         return context
-
-
-
-

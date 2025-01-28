@@ -32,40 +32,40 @@
     </style>
 </head>
 <body>
-<h1>Полный отчет</h1>
-<h3>Даты выхода сотрудника на работу</h3>
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="button" onclick="window.location.href='{% url 'supervisor'%}'">На главную</button>
-</form>
+    <h1>Полный отчет</h1>
+    <h3>Даты выхода сотрудника на работу</h3>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="button" onclick="window.location.href='{% url 'supervisor'%}'">На главную</button>
+    </form>
 
-{% if debug_info %}
-<div class="debug-info">
-    {{ debug_info }}
-</div>
-{% endif %}
+    {% if debug_info %}
+        <div class="debug-info">
+            {{ debug_info }}
+        </div>
+    {% endif %}
 
-{% if records_list %}
-<table>
-    <tr>
-        <th>Год</th>
-        <th>Месяц</th>
-        <th>День</th>
-        <th>Автор</th>
-    </tr>
-    {% for record in records_list %}
-    <tr>
-        <td>{{ record.year }}</td>
-        <td>{{ record.month }}</td>
-        <td>{{ record.day }}</td>
-        <td>{{ record.author__username }}</td>
-    </tr>
-    {% endfor %}
-</table>
-{% else %}
-<p>За выбранный период нет отчетов.</p>
-{% endif %}
+    {% if records_list %}
+        <table>
+            <tr>
+                <th>Год</th>
+                <th>Месяц</th>
+                <th>День</th>
+                <th>Автор</th>
+            </tr>
+            {% for record in records_list %}
+            <tr>
+                <td>{{ record.year }}</td>
+                <td>{{ record.month }}</td>
+                <td>{{ record.day }}</td>
+                <td>{{ record.author__username }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    {% else %}
+        <p>За выбранный период нет отчетов.</p>
+    {% endif %}
 
 </body>
 </html>

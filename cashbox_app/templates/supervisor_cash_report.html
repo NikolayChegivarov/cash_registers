@@ -1,12 +1,49 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <title>Отчет по кассам</title>
 </head>
-
 <body>
-</body>
+    <h1>Отчет по кассам</h1>
 
+    {% if cash_reports %}
+        <table>
+            <tr>
+                <th>Дата смены</th>
+                <th>Адрес</th>
+                <th>Касса</th>
+                <th>Остаток в начале</th>
+                <th>Внесено в кассу</th>
+                <th>С залога</th>
+                <th>Выдано займов</th>
+                <th>На хоз. нужды</th>
+                <th>Выемка руководителем</th>
+                <th>Остаток на конец дня</th>
+                <th>Сотрудник смены</th>
+                <th>Дата изменения</th>
+                <th>Статус</th>
+            </tr>
+            {% for cash_report in cash_reports %}
+            <tr>
+                <td>{{ cash_report.shift_date }}</td>
+                <td>{{ cash_report.id_address }}</td>
+                <td>{{ cash_report.cas_register }}</td>
+                <td>{{ cash_report.cash_balance_beginning }}</td>
+                <td>{{ cash_report.introduced }}</td>
+                <td>{{ cash_report.interest_return }}</td>
+                <td>{{ cash_report.loans_issued }}</td>
+                <td>{{ cash_report.used_farming }}</td>
+                <td>{{ cash_report.boss_took_it }}</td>
+                <td>{{ cash_report.cash_register_end }}</td>
+                <td>{{ cash_report.author }}</td>
+                <td>{{ cash_report.updated_at }}</td>
+                <td>{{ cash_report.status }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    {% else %}
+        <p>Нет данных для отображения.</p>
+    {% endif %}
+</body>
 </html>

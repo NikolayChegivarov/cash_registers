@@ -1185,8 +1185,22 @@ class CountVisitsFullView(TemplateView):
 
 class SupervisorCashReportView(TemplateView):  # Не доделан.
     """Отчет по кассам."""
-
     template_name = "supervisor_cash_report.html"
+
+    def get_context_data(self, **kwargs):
+        """Создает контекст для дальнейшего использования в шаблоне."""
+        context = super().get_context_data(**kwargs)
+        # Получаем все записи модели CashReport и сохраняем их в контекст
+        context["cash_reports"] = CashReport.objects.all()
+        return context
+
+        # # Преобразуем QuerySet в DataFrame
+        # df = pd.DataFrame(context["CashReport"])
+        # # Выводим результат в консоль
+        # print(df.to_string(index=False))
+        # print(f'context: {context}')
+
+        return context
 
 
 def extract_and_convert(key):
@@ -1231,7 +1245,7 @@ class PriceChangesView(FormView):
                         else:
                             logger.info(f"Обновлена цена {value} для пробы {numeric_key}.")
 
-                            # Check if value is None before converting to float
+                            # Проверяем, равно ли значение None перед преобразованием в число с плавающей точкой.
                             if value is not None:
                                 instance.price_rubles = float(value)
                             else:

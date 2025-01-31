@@ -60,6 +60,11 @@ from datetime import date
 import pandas as pd
 import psycopg2
 import logging
+import pprint
+
+from django.db.models import Max, OrderBy
+from django.utils.timezone import now
+from datetime import datetime, date
 
 
 logger = logging.getLogger(__name__)
@@ -133,6 +138,122 @@ def current_balance(address_id):
         print(f"Отчетов по Технике для адреса {address_id} не найдено")
 
     return balance
+
+
+def full_current_balance(address_id):
+    """Функция для получения текущего баланса кассы + введенные ранее данные."""
+    # Создаю словарь с балансами касс.
+    print("достаем все данные.")
+    balance = {"buying_up": None, "pawnshop": None, "technique": None}
+
+    # BUYING_UP ORM зарос
+    data_buying_up = (
+        CashReport.objects.filter(
+            cas_register=CashRegisterChoices.BUYING_UP, id_address_id=address_id
+        )
+        .annotate(last_updated=Max("updated_at"))
+        .order_by("-last_updated")
+        .first()
+    )
+    if data_buying_up:
+        balance['buying_up'] = {
+            'shift_date': data_buying_up.shift_date,
+            'cas_register': data_buying_up.cas_register,
+            'cash_balance_beginning': data_buying_up.cash_balance_beginning,
+            'introduced': data_buying_up.introduced,
+            'interest_return': data_buying_up.interest_return,
+            'loans_issued': data_buying_up.loans_issued,
+            'used_farming': data_buying_up.used_farming,
+            'boss_took_it': data_buying_up.boss_took_it,
+            'cash_register_end': data_buying_up.cash_register_end,
+            'author': data_buying_up.author,
+            'updated_at': data_buying_up.updated_at,
+            'status': data_buying_up.status
+        }
+
+    # PAWNSHOP ORM зарос
+    data_pawnshop = (
+        CashReport.objects.filter(
+            cas_register=CashRegisterChoices.PAWNSHOP, id_address_id=address_id
+        )
+        .annotate(last_updated=Max("updated_at"))
+        .order_by("-last_updated")
+        .first()
+    )
+    if data_pawnshop:
+        balance['pawnshop'] = {
+            'shift_date': data_pawnshop.shift_date,
+            'cas_register': data_pawnshop.cas_register,
+            'cash_balance_beginning': data_pawnshop.cash_balance_beginning,
+            'introduced': data_pawnshop.introduced,
+            'interest_return': data_pawnshop.interest_return,
+            'loans_issued': data_pawnshop.loans_issued,
+            'used_farming': data_pawnshop.used_farming,
+            'boss_took_it': data_pawnshop.boss_took_it,
+            'cash_register_end': data_pawnshop.cash_register_end,
+            'author': data_pawnshop.author,
+            'updated_at': data_pawnshop.updated_at,
+            'status': data_pawnshop.status
+        }
+
+    # TECHNIQUE ORM зарос
+    data_technique = (
+        CashReport.objects.filter(
+            cas_register=CashRegisterChoices.TECHNIQUE, id_address_id=address_id
+        )
+        .annotate(last_updated=Max("updated_at"))
+        .order_by("-last_updated")
+        .first()
+    )
+    if data_technique:
+        balance['technique'] = {
+            'shift_date': data_technique.shift_date,
+            'cas_register': data_technique.cas_register,
+            'cash_balance_beginning': data_technique.cash_balance_beginning,
+            'introduced': data_technique.introduced,
+            'interest_return': data_technique.interest_return,
+            'loans_issued': data_technique.loans_issued,
+            'used_farming': data_technique.used_farming,
+            'boss_took_it': data_technique.boss_took_it,
+            'cash_register_end': data_technique.cash_register_end,
+            'author': data_technique.author,
+            'updated_at': data_technique.updated_at,
+            'status': data_technique.status
+        }
+    pprint.pprint(f"________balance: {balance}\n_____")
+
+    return balance
+
+
+def date_last_report(selected_address_id):
+    """Находит дату последнего отчета."""
+    report_data = CashReport.objects.filter(
+        cas_register=CashRegisterChoices.BUYING_UP,
+        id_address_id=selected_address_id
+    ).values("updated_at").annotate(last_updated=Max("updated_at")).order_by("-last_updated").first()
+
+    if report_data:
+        updated_at = report_data['updated_at']
+
+        # Проверяем, является ли updated_at уже объектом datetime
+        if isinstance(updated_at, datetime):
+            formatted_date = updated_at.date()
+            return formatted_date
+        else:
+            parsed_date = datetime.strptime(str(updated_at), '%Y-%m-%d')
+            formatted_date = parsed_date.date()
+            return formatted_date
+    else:
+        print("Нет данных для форматирования")
+        return None
+
+
+def comparison_dates(today_data, report_data):
+    """Сравнивает дату сегодня и дату последнего отчета."""
+    if today_data == report_data:
+        return True
+    else:
+        return False
 
 
 class CustomLoginView(LoginView):
@@ -250,17 +371,61 @@ class CashReportView(LoginRequiredMixin, FormView):
         else:
             form.fields["id_address"].queryset = Address.objects.all()[:1]
 
+        # Проверка на дату:
+        today_data = date.today()
+        report_data = date_last_report(selected_address_id)
+        comparison_dates_ = comparison_dates(today_data, report_data)
+        print(f"_____ {comparison_dates_}")
+
+        # Получаем полную информацию по последнему отчету:
+        full_current = full_current_balance(selected_address_id)
+
         # Получаем актуальные балансы касс
         current_balance_ = current_balance(selected_address_id)
 
-        # Устанавливаю значения для полей.
-        form.initial["data"] = now().strftime("%Y-%m-%d")
-        form.initial["cas_register_buying_up"] = CashRegisterChoices.BUYING_UP
-        form.initial["cash_balance_beginning_buying_up"] = current_balance_["buying_up"]
-        form.initial["cas_register_pawnshop"] = CashRegisterChoices.PAWNSHOP
-        form.initial["cash_balance_beginning_pawnshop"] = current_balance_["pawnshop"]
-        form.initial["cas_register_technique"] = CashRegisterChoices.TECHNIQUE
-        form.initial["cash_balance_beginning_technique"] = current_balance_["technique"]
+        # Если отчет за сегодня уже сформирован.
+        if comparison_dates_:
+            print("СЕГОДНЯШНИЙ ОТЧЕТ")
+            # Устанавливаю значения для всех полей.
+            form.initial["data"] = now().strftime("%Y-%m-%d")
+
+            form.initial["cas_register_buying_up"] = CashRegisterChoices.BUYING_UP
+            form.initial["cash_balance_beginning_buying_up"] = full_current["buying_up"]["cash_balance_beginning"]
+            form.initial["introduced_buying_up"] = full_current["buying_up"]["introduced"]
+            form.initial["interest_return_buying_up"] = full_current["buying_up"]["interest_return"]
+            form.initial["loans_issued_buying_up"] = full_current["buying_up"]["loans_issued"]
+            form.initial["used_farming_buying_up"] = full_current["buying_up"]["used_farming"]
+            form.initial["boss_took_it_buying_up"] = full_current["buying_up"]["boss_took_it"]
+            form.initial["cash_register_end_buying_up"] = full_current["buying_up"]["cash_register_end"]
+
+            form.initial["cas_register_pawnshop"] = CashRegisterChoices.PAWNSHOP
+            form.initial["cash_balance_beginning_pawnshop"] = full_current["pawnshop"]["cash_balance_beginning"]
+            form.initial["introduced_pawnshop"] = full_current["pawnshop"]["introduced"]
+            form.initial["interest_return_pawnshop"] = full_current["pawnshop"]["interest_return"]
+            form.initial["loans_issued_pawnshop"] = full_current["pawnshop"]["loans_issued"]
+            form.initial["used_farming_pawnshop"] = full_current["pawnshop"]["used_farming"]
+            form.initial["boss_took_it_pawnshop"] = full_current["pawnshop"]["boss_took_it"]
+            form.initial["cash_register_end_pawnshop"] = full_current["pawnshop"]["cash_register_end"]
+
+            form.initial["cas_register_technique"] = CashRegisterChoices.TECHNIQUE
+            form.initial["cash_balance_beginning_technique"] = full_current["technique"]["cash_balance_beginning"]
+            form.initial["introduced_technique"] = full_current["technique"]["introduced"]
+            form.initial["interest_return_technique"] = full_current["technique"]["interest_return"]
+            form.initial["loans_issued_technique"] = full_current["technique"]["loans_issued"]
+            form.initial["used_farming_technique"] = full_current["technique"]["used_farming"]
+            form.initial["boss_took_it_technique"] = full_current["technique"]["boss_took_it"]
+            form.initial["cash_register_end_technique"] = full_current["technique"]["cash_register_end"]
+            pass
+        else:
+            print("ВЧЕРАШНИЙ ОТЧЕТ")
+            # Устанавливаю значения для полей начального баланса.
+            form.initial["data"] = now().strftime("%Y-%m-%d")
+            form.initial["cas_register_buying_up"] = CashRegisterChoices.BUYING_UP
+            form.initial["cash_balance_beginning_buying_up"] = current_balance_["buying_up"]
+            form.initial["cas_register_pawnshop"] = CashRegisterChoices.PAWNSHOP
+            form.initial["cash_balance_beginning_pawnshop"] = current_balance_["pawnshop"]
+            form.initial["cas_register_technique"] = CashRegisterChoices.TECHNIQUE
+            form.initial["cash_balance_beginning_technique"] = current_balance_["technique"]
 
         # Отключаю поля для редактирования
         form.fields["id_address"].disabled = True
@@ -300,7 +465,6 @@ class CashReportView(LoginRequiredMixin, FormView):
 
     def get_success_url(self):
         """Возвращает URL успешного завершения для текущего представления."""
-
         return reverse_lazy("report_submitted")
 
 

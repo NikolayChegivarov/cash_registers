@@ -40,6 +40,18 @@
             border: none;  /* удаляет любую границу с элемента */
             cursor: pointer;  /* стиль курсора в виде указывающей руки при наведении на элемент */
         }
+        button[name="submit_button"][value="Сменить пользователя"] {
+            background-color: gold;
+            color: black;
+            padding: 10px 20px;
+            border-radius: 5px;
+        }
+        button[name="submit_button"]:not([value="Сменить пользователя"]) {
+            background-color: gray;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+        }
     </style>
 
 </head>

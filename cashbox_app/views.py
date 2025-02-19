@@ -1878,12 +1878,12 @@ class TheRemainsView(TemplateView):
         context = super().get_context_data(**kwargs)
 
         # Получаем вчерашнюю дату
-        yesterday = timezone.now() - timezone.timedelta(days=1)
+        yesterday = timezone.now() - timezone.timedelta(days=0)
         start_of_yesterday = yesterday.replace(hour=0, minute=0, second=0, microsecond=0)
         end_of_yesterday = start_of_yesterday + timezone.timedelta(days=1)
 
         # Фильтруем данные на вчерашнюю дату
-        context['results'] = CashReport.objects.select_related('id_address') \
+        results = CashReport.objects.select_related('id_address') \
             .values(
             'id_address__city',
             'id_address__street',
@@ -1893,7 +1893,21 @@ class TheRemainsView(TemplateView):
         ) \
             .annotate(last_updated=Max("updated_at")) \
             .filter(updated_at__gte=start_of_yesterday, updated_at__lt=end_of_yesterday) \
-            .order_by('id_address__city', 'id_address__street', 'id_address__home')  # Сортировка по адресу
+            .order_by('id_address__city', 'id_address__street', 'id_address__home')
+
+        # Группируем данные по адресу
+        grouped_results = {}
+        for result in results:
+            address = f"{result['id_address__city']}, {result['id_address__street']}, {result['id_address__home']}"
+            if address not in grouped_results:
+                grouped_results[address] = {
+                    'BUYING_UP': 0,
+                    'PAWNSHOP': 0,
+                    'TECHNIQUE': 0,
+                }
+            grouped_results[address][result['cas_register']] = result['cash_register_end']
+
+        context['grouped_results'] = grouped_results
         return context
 
 

@@ -1,47 +1,85 @@
 {% block content %}
 <head>
-    <meta charset="UTF-8">
-    <title>Сверка кассы</title>
     <style>
+        /* Основные стили для таблицы */
         .balance-table {
             width: 100%;
             border-collapse: collapse;
+            margin: 20px 0;
+            font-family: Arial, sans-serif;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
-        .balance-table th, .balance-table td {
-            border: 1px solid #ddd;
-            padding: 8px;
-        }
+
+        /* Стили для заголовков таблицы */
         .balance-table th {
-            background-color: #f2f2f2;
-            color: black;
+            background-color: #4CAF50; /* Зеленый цвет */
+            color: white;
+            padding: 12px 15px;
+            text-align: left;
+            font-weight: bold;
+        }
+
+        /* Стили для ячеек таблицы */
+        .balance-table td {
+            padding: 10px 15px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        /* Стили для строк таблицы */
+        .balance-table tr:nth-child(even) {
+            background-color: #f9f9f9; /* Чередующийся цвет строк */
+        }
+
+        .balance-table tr:hover {
+            background-color: #f1f1f1; /* Эффект при наведении */
+        }
+
+        /* Стили для заголовка страницы */
+        h1 {
+            text-align: center;
+            color: #333;
+            font-family: Arial, sans-serif;
+            margin-top: 20px;
+        }
+
+        /* Контейнер для таблицы */
+        .table-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
     </style>
 </head>
-
-<form method="post">
-    {% csrf_token %}
-    <input type="hidden" name="next" value="{{ next }}">
-
-    <table class="balance-table">
-        <thead>
-            <tr>
-                <th>Адрес</th>
-                <th>Вид кассы</th>
-                <th>Сумма</th>
-                <th>Дата</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for result in results %}
-            <tr>
-                <td>{{ result.id_address__city }}, {{ result.id_address__street }}, {{ result.id_address__home }}</td>
-                <td>{{ result.cas_register }}</td>
-                <td>{{ result.cash_register_end }}</td>
-                <td>{{ result.last_updated|date:"Y-m-d H:i:s" }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-
-</form>
+<body>
+    <div class="table-container">
+        <h1>Отчет по кассам</h1>
+        <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="next" value="{{ next }}">
+            <table class="balance-table">
+                <thead>
+                    <tr>
+                        <th>Адрес</th>
+                        <th>BUYING_UP</th>
+                        <th>PAWNSHOP</th>
+                        <th>TECHNIQUE</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for address, data in grouped_results.items %}
+                    <tr>
+                        <td>{{ address }}</td>
+                        <td>{{ data.BUYING_UP }}</td>
+                        <td>{{ data.PAWNSHOP }}</td>
+                        <td>{{ data.TECHNIQUE }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </form>
+    </div>
+</body>
 {% endblock %}

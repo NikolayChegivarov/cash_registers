@@ -77,7 +77,7 @@ pd.set_option("display.width", 1000)
 
 
 def current_balance(address_id):
-    """Функция для получения текущего баланса кассы"""
+    """Функция для получения текущего баланса касс, конкретного филиала."""
     # Создаю словарь с балансами касс.
     balance = {"buying_up": None, "pawnshop": None, "technique": None}
 
@@ -141,7 +141,7 @@ def current_balance(address_id):
 
 
 def full_current_balance(address_id):
-    """Функция для получения текущего баланса кассы + введенные ранее данные."""
+    """Функция для получения текущего баланса кассы + введенные текущие данные."""
     # Создаю словарь с балансами касс.
     print("достаем все данные.")
     balance = {"buying_up": None, "pawnshop": None, "technique": None}
@@ -1868,3 +1868,24 @@ class ChangedStatusView(TemplateView):
         selected_address_id = self.kwargs.get('selected_address_id')
         context['selected_address_id'] = selected_address_id
         return context
+
+
+class TheRemainsView(TemplateView):
+    """Показать остатки по всем филиалам."""
+    template_name = "the-remains.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['results'] = CashReport.objects.select_related('id_address') \
+            .values(
+            'id_address__city',
+            'id_address__street',
+            'id_address__home',
+            'cas_register',
+            'cash_register_end'
+        ) \
+            .annotate(last_updated=Max("updated_at"))
+        pprint.pprint(context)
+        return context
+
+

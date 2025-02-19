@@ -38,7 +38,8 @@ from cashbox_app.views import (
     HarvestAddressSchoiceViews,
     HarvestAddressViews,
     ChangedStatusView,
-    CollectedMetalView
+    CollectedMetalView,
+    TheRemainsView
 )
 
 urlpatterns = [
@@ -124,4 +125,7 @@ urlpatterns = [
     path('changed-status/<int:selected_address_id>/',
          ChangedStatusView.as_view(),
          name='changed_status'),  # Показывает измененный адрес.
+    path('the_remains/',
+         TheRemainsView.as_view(),
+         name='the_remains'),  # Показывает измененный адрес.
 ]

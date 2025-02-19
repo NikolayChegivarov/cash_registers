@@ -1,0 +1,47 @@
+{% block content %}
+<head>
+    <meta charset="UTF-8">
+    <title>Сверка кассы</title>
+    <style>
+        .balance-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .balance-table th, .balance-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+        .balance-table th {
+            background-color: #f2f2f2;
+            color: black;
+        }
+    </style>
+</head>
+
+<form method="post">
+    {% csrf_token %}
+    <input type="hidden" name="next" value="{{ next }}">
+
+    <table class="balance-table">
+        <thead>
+            <tr>
+                <th>Адрес</th>
+                <th>Вид кассы</th>
+                <th>Сумма</th>
+                <th>Дата</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for result in results %}
+            <tr>
+                <td>{{ result.id_address__city }}, {{ result.id_address__street }}, {{ result.id_address__home }}</td>
+                <td>{{ result.cas_register }}</td>
+                <td>{{ result.cash_register_end }}</td>
+                <td>{{ result.last_updated|date:"Y-m-d H:i:s" }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+</form>
+{% endblock %}

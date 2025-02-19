@@ -1884,7 +1884,9 @@ class TheRemainsView(TemplateView):
             'cas_register',
             'cash_register_end'
         ) \
-            .annotate(last_updated=Max("updated_at"))
+            .annotate(last_updated=Max("updated_at")) \
+            .order_by('id_address__city', 'id_address__street', 'id_address__home')  # Сортировка по адресу
+
         pprint.pprint(context)
         return context
 

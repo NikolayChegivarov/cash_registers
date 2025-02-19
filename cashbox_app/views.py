@@ -1876,6 +1876,13 @@ class TheRemainsView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+
+        # Получаем вчерашнюю дату
+        yesterday = timezone.now() - timezone.timedelta(days=1)
+        start_of_yesterday = yesterday.replace(hour=0, minute=0, second=0, microsecond=0)
+        end_of_yesterday = start_of_yesterday + timezone.timedelta(days=1)
+
+        # Фильтруем данные на вчерашнюю дату
         context['results'] = CashReport.objects.select_related('id_address') \
             .values(
             'id_address__city',
@@ -1885,9 +1892,8 @@ class TheRemainsView(TemplateView):
             'cash_register_end'
         ) \
             .annotate(last_updated=Max("updated_at")) \
+            .filter(updated_at__gte=start_of_yesterday, updated_at__lt=end_of_yesterday) \
             .order_by('id_address__city', 'id_address__street', 'id_address__home')  # Сортировка по адресу
-
-        pprint.pprint(context)
         return context
 
 

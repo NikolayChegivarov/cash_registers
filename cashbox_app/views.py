@@ -1878,7 +1878,7 @@ class TheRemainsView(TemplateView):
         context = super().get_context_data(**kwargs)
 
         # Получаем вчерашнюю дату
-        yesterday = timezone.now() - timezone.timedelta(days=0)
+        yesterday = timezone.now() - timezone.timedelta(days=1)
         start_of_yesterday = yesterday.replace(hour=0, minute=0, second=0, microsecond=0)
         end_of_yesterday = start_of_yesterday + timezone.timedelta(days=1)
 

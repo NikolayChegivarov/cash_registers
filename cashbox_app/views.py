@@ -1914,7 +1914,6 @@ class TheRemainsView(TemplateView):
         buying_up_results = (
             SecretRoom.objects
             .filter(
-                shift_date__range=(start_of_yesterday, end_of_yesterday),
                 status=LocationStatusChoices.LOCAL
             )
             .select_related('id_address')

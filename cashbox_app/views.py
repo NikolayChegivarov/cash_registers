@@ -56,15 +56,18 @@ from cashbox_app.models import (
     PriceGoldStandard,
     SecretRoom,
 )
-from datetime import date
+from datetime import date, datetime
 import pandas as pd
 import psycopg2
 import logging
 import pprint
 
-from django.db.models import Max, OrderBy
+from django.db.models import Max, OrderBy, Sum
 from django.utils.timezone import now
-from datetime import datetime, date
+
+from django.views.generic import TemplateView
+from django.utils import timezone
+from datetime import timedelta
 
 
 logger = logging.getLogger(__name__)
@@ -1871,43 +1874,65 @@ class ChangedStatusView(TemplateView):
 
 
 class TheRemainsView(TemplateView):
-    """Показать остатки по всем филиалам."""
+    """Показать остатки денежных средств по всем кассам в филиалах и сумму скупки по адресам."""
     template_name = "the-remains.html"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
         # Получаем вчерашнюю дату
-        yesterday = timezone.now() - timezone.timedelta(days=1)
+        yesterday = timezone.now() - timedelta(days=1)
         start_of_yesterday = yesterday.replace(hour=0, minute=0, second=0, microsecond=0)
-        end_of_yesterday = start_of_yesterday + timezone.timedelta(days=1)
+        end_of_yesterday = start_of_yesterday + timedelta(days=1)
 
-        # Фильтруем данные на вчерашнюю дату
-        results = CashReport.objects.select_related('id_address') \
+        # 1. Запрос для CashReport (остатки по кассам)
+        cash_results = CashReport.objects.select_related('id_address') \
             .values(
-            'id_address__city',
-            'id_address__street',
-            'id_address__home',
-            'cas_register',
-            'cash_register_end'
-        ) \
+                'id_address__city',
+                'id_address__street',
+                'id_address__home',
+                'cas_register',
+                'cash_register_end'
+            ) \
             .annotate(last_updated=Max("updated_at")) \
             .filter(updated_at__gte=start_of_yesterday, updated_at__lt=end_of_yesterday) \
             .order_by('id_address__city', 'id_address__street', 'id_address__home')
 
         # Группируем данные по адресу
-        grouped_results = {}
-        for result in results:
+        grouped_cash_results = {}
+        for result in cash_results:
             address = f"{result['id_address__city']}, {result['id_address__street']}, {result['id_address__home']}"
-            if address not in grouped_results:
-                grouped_results[address] = {
+            if address not in grouped_cash_results:
+                grouped_cash_results[address] = {
                     'BUYING_UP': 0,
                     'PAWNSHOP': 0,
                     'TECHNIQUE': 0,
                 }
-            grouped_results[address][result['cas_register']] = result['cash_register_end']
+            grouped_cash_results[address][result['cas_register']] = result['cash_register_end']
 
-        context['grouped_results'] = grouped_results
+        # 2. Запрос для SecretRoom (суммы скупки по адресам)
+        buying_up_results = (
+            SecretRoom.objects
+            .filter(
+                shift_date__range=(start_of_yesterday, end_of_yesterday),
+                status=LocationStatusChoices.LOCAL
+            )
+            .select_related('id_address')
+            .values(
+                'id_address__city',
+                'id_address__street',
+                'id_address__home'
+            )
+            .annotate(total_sum=Sum('sum'))
+            .order_by('id_address__city', 'id_address__street', 'id_address__home')
+        )
+
+        # Группируем данные по адресу
+        grouped_buying_up = {}
+        for result in buying_up_results:
+            address = f"{result['id_address__city']}, {result['id_address__street']}, {result['id_address__home']}"
+            grouped_buying_up[address] = result['total_sum']
+
+        context['grouped_cash_results'] = grouped_cash_results
+        context['grouped_buying_up'] = grouped_buying_up
         return context
-
-

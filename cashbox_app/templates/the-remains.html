@@ -1,7 +1,7 @@
 {% block content %}
 <head>
     <style>
-        /* Основные стили для таблицы */
+        /* Основные стили для таблиц */
         .balance-table {
             width: 100%;
             border-collapse: collapse;
@@ -12,7 +12,7 @@
 
         /* Стили для заголовков таблицы */
         .balance-table th {
-            background-color: #4CAF50; /* Зеленый цвет */
+            background-color: #4CAF50;
             color: white;
             padding: 12px 15px;
             text-align: left;
@@ -27,29 +27,36 @@
 
         /* Стили для строк таблицы */
         .balance-table tr:nth-child(even) {
-            background-color: #f9f9f9; /* Чередующийся цвет строк */
+            background-color: #f9f9f9;
         }
 
         .balance-table tr:hover {
-            background-color: #f1f1f1; /* Эффект при наведении */
+            background-color: #f1f1f1;
         }
 
-        /* Стили для заголовка страницы */
-        h1 {
+        /* Стили для заголовков страницы */
+        h1, h2 {
             text-align: center;
             color: #333;
             font-family: Arial, sans-serif;
             margin-top: 20px;
         }
 
-        /* Контейнер для таблицы */
+        /* Контейнеры для таблиц */
         .table-container {
             max-width: 1200px;
-            margin: 0 auto;
+            margin: 20px auto;
             padding: 20px;
             background-color: #fff;
             border-radius: 8px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .section-divider {
+            margin: 30px 0;
+            border: 0;
+            height: 1px;
+            background-image: linear-gradient(to right, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0));
         }
     </style>
 </head>
@@ -69,7 +76,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for address, data in grouped_results.items %}
+                    {% for address, data in grouped_cash_results.items %}
                     <tr>
                         <td>{{ address }}</td>
                         <td>{{ data.BUYING_UP }}</td>
@@ -80,6 +87,28 @@
                 </tbody>
             </table>
         </form>
+    </div>
+
+    <hr class="section-divider">
+
+    <div class="table-container">
+        <h2>Суммы скупки по адресам</h2>
+        <table class="balance-table">
+            <thead>
+                <tr>
+                    <th>АДРЕС</th>
+                    <th>СУММА СКУПКИ</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for address, sum in grouped_buying_up.items %}
+                <tr>
+                    <td>{{ address }}</td>
+                    <td>{{ sum }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
 </body>
 {% endblock %}

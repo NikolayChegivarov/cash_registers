@@ -12,6 +12,7 @@ from django import forms
 from django.contrib.auth.forms import AuthenticationForm
 from decimal import Decimal
 from django.utils.timezone import now
+from django.db.utils import ProgrammingError
 
 
 class CustomAuthenticationForm(AuthenticationForm):
@@ -491,50 +492,71 @@ class PriceChangesForm(forms.Form):
         max_digits=10,
         decimal_places=2,
         required=False,
-        initial=PriceGoldStandard.objects.filter(gold_standard=375).first().price_rubles if PriceGoldStandard.objects.filter(
-            gold_standard=375).exists() else None,
         label="золото 375",
     )
     gold_500 = forms.DecimalField(
         max_digits=10,
         decimal_places=2,
         required=False,
-        initial=PriceGoldStandard.objects.filter(gold_standard=500).first().price_rubles if PriceGoldStandard.objects.filter(
-            gold_standard=500).exists() else None,
         label="золото 500",
     )
     gold_585 = forms.DecimalField(
         max_digits=10,
         decimal_places=2,
         required=False,
-        initial=PriceGoldStandard.objects.filter(gold_standard=585).first().price_rubles if PriceGoldStandard.objects.filter(
-            gold_standard=585).exists() else None,
         label="золото 585",
     )
     gold_750 = forms.DecimalField(
         max_digits=10,
         decimal_places=2,
         required=False,
-        initial=PriceGoldStandard.objects.filter(gold_standard=750).first().price_rubles if PriceGoldStandard.objects.filter(
-            gold_standard=750).exists() else None,
         label="золото 750",
     )
     silver_875 = forms.DecimalField(
         max_digits=10,
         decimal_places=2,
         required=False,
-        initial=PriceGoldStandard.objects.filter(gold_standard=875).first().price_rubles if PriceGoldStandard.objects.filter(
-            gold_standard=875).exists() else None,
         label="серебро 875",
     )
     silver_925 = forms.DecimalField(
         max_digits=10,
         decimal_places=2,
         required=False,
-        initial=PriceGoldStandard.objects.filter(gold_standard=925).first().price_rubles if PriceGoldStandard.objects.filter(
-            gold_standard=925).exists() else None,
         label="серебро 925",
     )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        # Устанавливаем initial значения только если модель существует
+        try:
+            if not self.initial.get('gold_375'):
+                self.fields['gold_375'].initial = PriceGoldStandard.objects.filter(
+                    gold_standard=375).first().price_rubles if PriceGoldStandard.objects.filter(
+                    gold_standard=375).exists() else None
+            if not self.initial.get('gold_500'):
+                self.fields['gold_500'].initial = PriceGoldStandard.objects.filter(
+                    gold_standard=500).first().price_rubles if PriceGoldStandard.objects.filter(
+                    gold_standard=500).exists() else None
+            if not self.initial.get('gold_585'):
+                self.fields['gold_585'].initial = PriceGoldStandard.objects.filter(
+                    gold_standard=585).first().price_rubles if PriceGoldStandard.objects.filter(
+                    gold_standard=585).exists() else None
+            if not self.initial.get('gold_750'):
+                self.fields['gold_750'].initial = PriceGoldStandard.objects.filter(
+                    gold_standard=750).first().price_rubles if PriceGoldStandard.objects.filter(
+                    gold_standard=750).exists() else None
+            if not self.initial.get('silver_875'):
+                self.fields['silver_875'].initial = PriceGoldStandard.objects.filter(
+                    gold_standard=875).first().price_rubles if PriceGoldStandard.objects.filter(
+                    gold_standard=875).exists() else None
+            if not self.initial.get('silver_925'):
+                self.fields['silver_925'].initial = PriceGoldStandard.objects.filter(
+                    gold_standard=925).first().price_rubles if PriceGoldStandard.objects.filter(
+                    gold_standard=925).exists() else None
+        except ProgrammingError:
+            # Игнорируем ошибку, если таблица ещё не существует
+            pass
 
 
 class SecretRoomForm(forms.ModelForm):

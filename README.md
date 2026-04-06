@@ -1,8 +1,8 @@
 # CashBox Management System
 
-***-this is a web application created using Django designed to control operations of a cash register for various 
+***- this is a web application created using Django designed to control operations of a cash register for various 
 types of activities, such as buying, pawnshop and Maintenance. This system provides a comprehensive tracking 
-platform financial transactions, management of cash residues and accurate records. *** 
+platform financial transactions, management of cash residues and accurate records.*** 
 
 ## The main functionality. 
 

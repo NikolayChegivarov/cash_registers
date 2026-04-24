@@ -57,3 +57,38 @@ platform financial transactions, management of cash residues and accurate record
                  Позволяет установить цены на лом ювелирных изделий в разрезе проб. 
             Скупки. 
                  Позволяет управлять скупочной деятельностью.
+
+
+## Запуск сервера как systemd-сервиса (автозапуск при включении)
+
+Сервер настроен на автоматический запуск при загрузке системы через systemd.
+
+### Файл сервиса
+`/etc/systemd/system/cashregisters.service`
+
+### Команды управления
+
+```bash
+# Запуск сервиса
+sudo systemctl start cashregisters.service
+
+# Остановка сервиса
+sudo systemctl stop cashregisters.service
+
+# Перезапуск сервиса
+sudo systemctl restart cashregisters.service
+
+# Проверка статуса
+sudo systemctl status cashregisters.service
+
+# Просмотр логов в реальном времени
+journalctl -u cashregisters.service -f
+```
+Параметры запуска  
+Адрес: 0.0.0.0:8001 (доступен снаружи)  
+Пользователь: nixon  
+Рабочая директория: /home/nixon/cash_registers  
+Виртуальное окружение: /home/nixon/cash_registers/.venv  
+
+Доступ к сайту:  
+http://134.19.147.175:8001/login/
